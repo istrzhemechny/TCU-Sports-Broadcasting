@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -23,6 +24,9 @@ class CrewMemberControllerIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    CrewMemberRepository crewMemberRepository;
 
     @Test
     void shouldCreateCrewMemberAndPersistToDatabase() throws Exception {
@@ -44,6 +48,32 @@ class CrewMemberControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flag").value(true))
                 .andExpect(jsonPath("$.data.email").value("clark.kent@dailyplanet.com"))
-                .andExpect(jsonPath("$.data.positions[0]").value("Camera"));
+                .andExpect(jsonPath("$.data.position[0]").value("Camera"));
     }
+
+    @Test
+    void shouldReturnCrewMemberByIdFromDatabase() throws Exception {
+        // Arrange: manually insert a crew member using the repository
+        CrewMember cm = new CrewMember();
+        cm.setFirstName("Bruce");
+        cm.setLastName("Wayne");
+        cm.setEmail("bruce@wayneenterprises.com");
+        cm.setPhoneNumber("0001234567");
+        cm.setPassword("batman");
+        cm.setRole("ADMIN");
+        cm.setPositions(Arrays.asList("Producer", "EVS"));
+
+        cm = crewMemberRepository.save(cm); // get generated ID
+
+        // Act + Assert
+        mockMvc.perform(get("/User/crewMember/{userId}", cm.getId())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.message").value("Find Success"))
+                .andExpect(jsonPath("$.data.email").value("bruce@wayneenterprises.com"))
+                .andExpect(jsonPath("$.data.position[0]").value("Producer"));
+    }
+
 }

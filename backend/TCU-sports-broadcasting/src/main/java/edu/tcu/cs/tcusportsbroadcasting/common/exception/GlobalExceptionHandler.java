@@ -1,6 +1,7 @@
 package edu.tcu.cs.tcusportsbroadcasting.common.exception;
 
 import edu.tcu.cs.tcusportsbroadcasting.common.ApiResponse;
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -22,10 +23,12 @@ public class GlobalExceptionHandler {
 
         for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
             errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+            System.err.println("Validation error on '" + fieldError.getField() + "': " + fieldError.getDefaultMessage());
         }
 
         return new ApiResponse(false, 400, "Provided arguments are invalid, see data for details.", errors);
     }
+
 
     @ExceptionHandler(DuplicateEmailException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -47,4 +50,11 @@ public class GlobalExceptionHandler {
     public ApiResponse handleAllOtherExceptions(Exception ex) {
         return new ApiResponse(false, 500, "Internal server error.", ex.getMessage());
     }
+
+    @ExceptionHandler(CrewMemberNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiResponse handleCrewMemberNotFound(CrewMemberNotFoundException ex) {
+        return new ApiResponse(false, 404, ex.getMessage(), null);
+    }
+
 }

@@ -6,6 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class DBDataInitializer implements CommandLineRunner {
@@ -38,5 +39,17 @@ public class DBDataInitializer implements CommandLineRunner {
 
         crewMemberRepository.save(cm1);
         crewMemberRepository.save(cm2);
+
+        CrewMember cm3 = new CrewMember();
+        cm3.setFirstName("Clark");
+        cm3.setLastName("Kent");
+        cm3.setEmail("clark.kent2@dailyplanet.com");
+        cm3.setPhoneNumber("1234567890");
+        cm3.setPassword("superman");
+        cm3.setRole("ADMIN");
+        cm3.setPositions(List.of("Director", "Producer"));
+
+        crewMemberRepository.save(cm3);
+
     }
 }

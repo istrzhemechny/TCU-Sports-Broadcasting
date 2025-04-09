@@ -4,11 +4,15 @@ import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMember;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMemberRepository;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -52,7 +56,7 @@ class CrewMemberServiceTest {
         // then
         assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getFirstName()).isEqualTo("Alice");
-        assertThat(result.getPositions()).contains("Director", "Graphics");
+        assertThat(result.getPosition()).contains("Director", "Graphics");
     }
 
 
@@ -69,4 +73,40 @@ class CrewMemberServiceTest {
                 () -> crewMemberService.addCrewMember("token", dto)
         );
     }
+
+    @Test
+    void shouldReturnCrewMemberById() {
+        // Arrange
+        CrewMember cm = new CrewMember();
+        cm.setId(1L);
+        cm.setFirstName("Peter");
+        cm.setLastName("Parker");
+        cm.setEmail("peter@dailybugle.com");
+        cm.setPhoneNumber("2223334444");
+        cm.setPassword("sp1derm@n");
+        cm.setRole("USER");
+        cm.setPositions(List.of("Graphics"));
+
+        when(crewMemberRepository.findById(1L)).thenReturn(Optional.of(cm));
+
+        // Act
+        CrewMemberResponseDto result = crewMemberService.findById(1L);
+
+        // Assert
+        assertThat(result.getEmail()).isEqualTo("peter@dailybugle.com");
+        assertThat(result.getRole()).isEqualTo("USER");
+        assertThat(result.getPosition()).contains("Graphics");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenCrewMemberNotFound() {
+        // Arrange
+        when(crewMemberRepository.findById(404L)).thenReturn(Optional.empty());
+
+        // Assert
+        Assertions.assertThrows(CrewMemberNotFoundException.class, () -> {
+            crewMemberService.findById(404L);
+        });
+    }
+
 }

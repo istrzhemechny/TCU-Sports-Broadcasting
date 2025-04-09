@@ -25,7 +25,7 @@ public class CrewMember {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "crew_member_positions", joinColumns = @JoinColumn(name = "crew_member_id"))
     @Column(name = "position")
-    private List<String> positions;
+    private List<String> position;
 
     // Getters and Setters
 
@@ -86,10 +86,10 @@ public class CrewMember {
     }
 
     public List<String> getPositions() {
-        return positions;
+        return position;
     }
 
-    public void setPositions(List<String> positions) {
-        this.positions = positions;
+    public void setPositions(List<String> position) {
+        this.position = position;
     }
 }

@@ -10,7 +10,7 @@ public class CrewMemberResponseDto {
     private String email;
     private String phoneNumber;
     private String role;
-    private List<String> positions;
+    private List<String> position;
 
     public CrewMemberResponseDto(Long id, String firstName, String lastName, String email, String phoneNumber, String role, List<String> positions) {
         this.id = id;
@@ -19,7 +19,7 @@ public class CrewMemberResponseDto {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.role = role;
-        this.positions = positions;
+        this.position = positions;
     }
 
     // Getters and Setters
@@ -33,12 +33,12 @@ public class CrewMemberResponseDto {
         this.id = id;
     }
 
-    public List<String> getPositions() {
-        return positions;
+    public List<String> getPosition() {
+        return position;
     }
 
-    public void setPositions(List<String> positions) {
-        this.positions = positions;
+    public void setPosition(List<String> position) {
+        this.position = position;
     }
 
     public String getRole() {

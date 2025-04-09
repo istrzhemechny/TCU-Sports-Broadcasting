@@ -34,4 +34,19 @@ public class CrewMemberController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/crewMember/{userId}")
+    public ResponseEntity<ApiResponse> findCrewMemberById(@PathVariable Long userId) {
+        CrewMemberResponseDto found = crewMemberService.findById(userId);
+
+        ApiResponse response = new ApiResponse(
+                true,
+                200,
+                "Find Success",
+                found
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
 }

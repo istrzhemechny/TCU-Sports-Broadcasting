@@ -3,6 +3,7 @@ package edu.tcu.cs.tcusportsbroadcasting.crewmember;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMember;
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailException;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMemberRepository;
 import org.springframework.stereotype.Service;
@@ -44,4 +45,20 @@ public class CrewMemberService {
                 saved.getPositions()
         );
     }
+
+    public CrewMemberResponseDto findById(Long id) {
+        CrewMember crewMember = crewMemberRepository.findById(id)
+                .orElseThrow(() -> new CrewMemberNotFoundException(id));
+
+        return new CrewMemberResponseDto(
+                crewMember.getId(),
+                crewMember.getFirstName(),
+                crewMember.getLastName(),
+                crewMember.getEmail(),
+                crewMember.getPhoneNumber(),
+                crewMember.getRole(),
+                crewMember.getPositions()
+        );
+    }
+
 }
