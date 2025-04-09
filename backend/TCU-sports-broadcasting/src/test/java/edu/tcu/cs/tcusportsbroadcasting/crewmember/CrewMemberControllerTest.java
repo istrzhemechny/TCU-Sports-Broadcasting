@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -65,4 +66,31 @@ class CrewMemberControllerTest {
                 .andExpect(jsonPath("$.message").value("Add Success"))
                 .andExpect(jsonPath("$.data.email").value("jane.doe@example.com"));
     }
+
+    @Test
+    void shouldReturnCrewMemberByIdSuccessfully() throws Exception {
+        // Arrange
+        Long id = 1L;
+        CrewMemberResponseDto responseDto = new CrewMemberResponseDto(
+                id,
+                "John",
+                "Doe",
+                "john.doe@example.com",
+                "1234567890",
+                "ADMIN",
+                Arrays.asList("DIRECTOR", "PRODUCER")
+        );
+
+        Mockito.when(crewMemberService.findById(id)).thenReturn(responseDto);
+
+        // Act + Assert
+        mockMvc.perform(get("/User/crewMember/{userId}", id)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.message").value("Find Success"))
+                .andExpect(jsonPath("$.data.email").value("john.doe@example.com"));
+    }
+
 }
