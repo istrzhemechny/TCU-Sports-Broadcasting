@@ -1,6 +1,7 @@
 package edu.tcu.cs.tcusportsbroadcasting.crewmember;
 
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberListDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMember;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
@@ -8,6 +9,9 @@ import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailExcep
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -31,7 +35,7 @@ public class CrewMemberService {
         crewMember.setPhoneNumber(dto.getPhoneNumber());
         crewMember.setPassword(dto.getPassword()); // consider hashing in the future
         crewMember.setRole(dto.getRole());
-        crewMember.setPositions(dto.getPosition());
+        crewMember.setPosition(dto.getPosition());
 
         CrewMember saved = crewMemberRepository.save(crewMember);
 
@@ -42,7 +46,7 @@ public class CrewMemberService {
                 saved.getEmail(),
                 saved.getPhoneNumber(),
                 saved.getRole(),
-                saved.getPositions()
+                saved.getPosition()
         );
     }
 
@@ -57,8 +61,20 @@ public class CrewMemberService {
                 crewMember.getEmail(),
                 crewMember.getPhoneNumber(),
                 crewMember.getRole(),
-                crewMember.getPositions()
+                crewMember.getPosition()
         );
     }
+
+    public List<CrewMemberListDto> findAll() {
+        return crewMemberRepository.findAll().stream()
+                .map(c -> new CrewMemberListDto(
+                        c.getId(),
+                        c.getFirstName() + " " + c.getLastName(),
+                        c.getEmail(),
+                        c.getPhoneNumber()
+                ))
+                .collect(Collectors.toList());
+    }
+
 
 }

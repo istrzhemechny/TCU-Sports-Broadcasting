@@ -32,7 +32,7 @@ public class DBDataInitializer implements CommandLineRunner {
         cm1.setPhoneNumber("1234567890");
         cm1.setPassword("P@ssw0rd");
         cm1.setRole("ADMIN");
-        cm1.setPositions(Arrays.asList("Director", "Producer"));
+        cm1.setPosition(Arrays.asList("Director", "Producer"));
 
         CrewMember cm2 = new CrewMember();
         cm2.setFirstName("Jane");
@@ -41,7 +41,7 @@ public class DBDataInitializer implements CommandLineRunner {
         cm2.setPhoneNumber("9876543210");
         cm2.setPassword("Secret123");
         cm2.setRole("USER");
-        cm2.setPositions(Arrays.asList("Camera", "Graphics"));
+        cm2.setPosition(Arrays.asList("Camera", "Graphics"));
 
         crewMemberRepository.save(cm1);
         crewMemberRepository.save(cm2);
@@ -53,7 +53,7 @@ public class DBDataInitializer implements CommandLineRunner {
         cm3.setPhoneNumber("1234567890");
         cm3.setPassword("superman");
         cm3.setRole("ADMIN");
-        cm3.setPositions(List.of("Director", "Producer"));
+        cm3.setPosition(List.of("Director", "Producer"));
 
         crewMemberRepository.save(cm3);
 

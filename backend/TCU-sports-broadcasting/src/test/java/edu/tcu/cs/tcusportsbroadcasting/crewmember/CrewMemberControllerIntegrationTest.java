@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -61,7 +62,7 @@ class CrewMemberControllerIntegrationTest {
         cm.setPhoneNumber("0001234567");
         cm.setPassword("batman");
         cm.setRole("ADMIN");
-        cm.setPositions(Arrays.asList("Producer", "EVS"));
+        cm.setPosition(Arrays.asList("Producer", "EVS"));
 
         cm = crewMemberRepository.save(cm); // get generated ID
 
@@ -75,5 +76,42 @@ class CrewMemberControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.email").value("bruce@wayneenterprises.com"))
                 .andExpect(jsonPath("$.data.position[0]").value("Producer"));
     }
+
+    @Test
+    void shouldReturnAllCrewMembersFromDatabase() throws Exception {
+        // Clear and re-seed the DB
+        crewMemberRepository.deleteAll();
+
+        CrewMember cm1 = new CrewMember();
+        cm1.setFirstName("John");
+        cm1.setLastName("Doe");
+        cm1.setEmail("john.doe@example.com");
+        cm1.setPhoneNumber("1234567890");
+        cm1.setPassword("password");
+        cm1.setRole("USER");
+        cm1.setPosition(List.of("Graphics"));
+
+        CrewMember cm2 = new CrewMember();
+        cm2.setFirstName("Jane");
+        cm2.setLastName("Smith");
+        cm2.setEmail("jane.smith@example.com");
+        cm2.setPhoneNumber("1112223333");
+        cm2.setPassword("password");
+        cm2.setRole("USER");
+        cm2.setPosition(List.of("Camera"));
+
+        crewMemberRepository.save(cm1);
+        crewMemberRepository.save(cm2);
+
+        mockMvc.perform(get("/User/crewMember")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.message").value("Find Success"))
+                .andExpect(jsonPath("$.data.length()").value(2))
+                .andExpect(jsonPath("$.data[0].fullName").value("John Doe"));
+    }
+
 
 }
