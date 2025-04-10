@@ -85,11 +85,11 @@ public class CrewMember {
         this.role = role;
     }
 
-    public List<String> getPositions() {
+    public List<String> getPosition() {
         return position;
     }
 
-    public void setPositions(List<String> position) {
+    public void setPosition(List<String> position) {
         this.position = position;
     }
 }

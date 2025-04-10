@@ -2,11 +2,14 @@ package edu.tcu.cs.tcusportsbroadcasting.crewmember;
 
 import edu.tcu.cs.tcusportsbroadcasting.common.ApiResponse;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberListDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/User")
@@ -48,5 +51,20 @@ public class CrewMemberController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/crewMember")
+    public ResponseEntity<ApiResponse> findAllCrewMembers() {
+        List<CrewMemberListDto> crewList = crewMemberService.findAll();
+
+        ApiResponse response = new ApiResponse(
+                true,
+                200,
+                "Find Success",
+                crewList
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
 
 }

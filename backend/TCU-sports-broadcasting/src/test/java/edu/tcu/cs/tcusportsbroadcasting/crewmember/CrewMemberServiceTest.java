@@ -82,7 +82,7 @@ class CrewMemberServiceTest {
         cm.setPhoneNumber("2223334444");
         cm.setPassword("sp1derm@n");
         cm.setRole("USER");
-        cm.setPositions(List.of("Graphics"));
+        cm.setPosition(List.of("Graphics"));
 
         when(crewMemberRepository.findById(1L)).thenReturn(Optional.of(cm));
 

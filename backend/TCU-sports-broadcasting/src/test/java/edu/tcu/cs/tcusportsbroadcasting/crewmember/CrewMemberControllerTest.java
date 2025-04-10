@@ -2,6 +2,7 @@ package edu.tcu.cs.tcusportsbroadcasting.crewmember;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberListDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,6 +13,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -92,5 +94,27 @@ class CrewMemberControllerTest {
                 .andExpect(jsonPath("$.message").value("Find Success"))
                 .andExpect(jsonPath("$.data.email").value("john.doe@example.com"));
     }
+
+    @Test
+    void shouldReturnAllCrewMembersSuccessfully() throws Exception {
+        CrewMemberListDto cm1 = new CrewMemberListDto(
+                1L, "John Doe", "john.doe@example.com", "1234567890"
+        );
+        CrewMemberListDto cm2 = new CrewMemberListDto(
+                2L, "Jane Smith", "jane.smith@example.com", "1112223333"
+        );
+
+        Mockito.when(crewMemberService.findAll()).thenReturn(List.of(cm1, cm2));
+
+        mockMvc.perform(get("/User/crewMember")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.message").value("Find Success"))
+                .andExpect(jsonPath("$.data.length()").value(2))
+                .andExpect(jsonPath("$.data[0].fullName").value("John Doe"));
+    }
+
 
 }
