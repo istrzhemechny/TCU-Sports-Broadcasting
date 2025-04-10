@@ -1,14 +1,11 @@
 package edu.tcu.cs.tcusportsbroadcasting.crewmember;
 
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
-import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMember;
-import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMemberRepository;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.util.Arrays;
 import java.util.List;

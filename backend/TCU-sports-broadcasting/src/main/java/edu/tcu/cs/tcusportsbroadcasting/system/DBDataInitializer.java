@@ -2,9 +2,12 @@ package edu.tcu.cs.tcusportsbroadcasting.system;
 
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMember;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMemberRepository;
+import edu.tcu.cs.tcusportsbroadcasting.gameschedule.Game;
+import edu.tcu.cs.tcusportsbroadcasting.gameschedule.GameRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
@@ -13,8 +16,11 @@ public class DBDataInitializer implements CommandLineRunner {
 
     private final CrewMemberRepository crewMemberRepository;
 
-    public DBDataInitializer(CrewMemberRepository crewMemberRepository) {
+    private final GameRepository gameRepository;
+
+    public DBDataInitializer(CrewMemberRepository crewMemberRepository, GameRepository gameRepository) {
         this.crewMemberRepository = crewMemberRepository;
+        this.gameRepository = gameRepository;
     }
 
     @Override
@@ -50,6 +56,24 @@ public class DBDataInitializer implements CommandLineRunner {
         cm3.setPositions(List.of("Director", "Producer"));
 
         crewMemberRepository.save(cm3);
+
+        Game g1 = new Game();
+        g1.setScheduleId(1L);
+        g1.setGameDate(LocalDate.of(2024, 9, 7));
+        g1.setVenue("Carter");
+        g1.setOpponent("LIU");
+        g1.setFinalized(false);
+
+        Game g2 = new Game();
+        g2.setScheduleId(1L);
+        g2.setGameDate(LocalDate.of(2024, 9, 14));
+        g2.setVenue("Carter");
+        g2.setOpponent("UCF");
+        g2.setFinalized(false);
+
+        gameRepository.save(g1);
+        gameRepository.save(g2);
+
 
     }
 }
