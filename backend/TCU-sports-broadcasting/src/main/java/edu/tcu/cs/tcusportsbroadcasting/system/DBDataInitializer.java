@@ -1,5 +1,7 @@
 package edu.tcu.cs.tcusportsbroadcasting.system;
 
+import edu.tcu.cs.tcusportsbroadcasting.availability.Availability;
+import edu.tcu.cs.tcusportsbroadcasting.availability.AvailabilityRepository;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMember;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMemberRepository;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.Game;
@@ -18,9 +20,12 @@ public class DBDataInitializer implements CommandLineRunner {
 
     private final GameRepository gameRepository;
 
-    public DBDataInitializer(CrewMemberRepository crewMemberRepository, GameRepository gameRepository) {
+    private final AvailabilityRepository availabilityRepository;
+
+    public DBDataInitializer(CrewMemberRepository crewMemberRepository, GameRepository gameRepository, AvailabilityRepository availabilityRepository) {
         this.crewMemberRepository = crewMemberRepository;
         this.gameRepository = gameRepository;
+        this.availabilityRepository = availabilityRepository;
     }
 
     @Override
@@ -73,6 +78,19 @@ public class DBDataInitializer implements CommandLineRunner {
 
         gameRepository.save(g1);
         gameRepository.save(g2);
+
+        // Fetch existing crew member and game
+        cm1 = crewMemberRepository.findAll().get(0);
+        Game game1 = gameRepository.findAll().get(0);
+
+// Create availability record
+        Availability a1 = new Availability();
+        a1.setCrewMember(cm1);
+        a1.setGame(game1);
+        a1.setAvailability(1); // available
+        a1.setComment("Can be there early");
+
+        availabilityRepository.save(a1);
 
 
     }

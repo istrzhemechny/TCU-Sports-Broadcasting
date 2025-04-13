@@ -1,5 +1,8 @@
 package edu.tcu.cs.tcusportsbroadcasting.common.exception;
 
+import edu.tcu.cs.tcusportsbroadcasting.availability.exception.AvailabilityAlreadyExistsException;
+import edu.tcu.cs.tcusportsbroadcasting.availability.exception.AvailabilityGameNotFoundException;
+import edu.tcu.cs.tcusportsbroadcasting.availability.exception.AvailabilityUserNotFoundException;
 import edu.tcu.cs.tcusportsbroadcasting.common.ApiResponse;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailException;
@@ -55,6 +58,24 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiResponse handleCrewMemberNotFound(CrewMemberNotFoundException ex) {
         return new ApiResponse(false, 404, ex.getMessage(), null);
+    }
+
+    @ExceptionHandler(AvailabilityUserNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiResponse handleUserNotFound(AvailabilityUserNotFoundException ex) {
+        return new ApiResponse(false, 404, ex.getMessage(), null);
+    }
+
+    @ExceptionHandler(AvailabilityGameNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiResponse handleGameNotFound(AvailabilityGameNotFoundException ex) {
+        return new ApiResponse(false, 404, ex.getMessage(), null);
+    }
+
+    @ExceptionHandler(AvailabilityAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiResponse handleDuplicate(AvailabilityAlreadyExistsException ex) {
+        return new ApiResponse(false, 409, ex.getMessage(), null);
     }
 
 }

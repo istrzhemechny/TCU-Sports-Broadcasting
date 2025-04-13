@@ -1,6 +1,7 @@
 package edu.tcu.cs.tcusportsbroadcasting.gameschedule;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.tcu.cs.tcusportsbroadcasting.availability.AvailabilityRepository;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.Game;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.GameRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,10 +28,14 @@ class GameControllerIntegrationTest {
     private GameRepository gameRepository;
 
     @Autowired
+    private AvailabilityRepository availabilityRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
+        availabilityRepository.deleteAll();
         gameRepository.deleteAll();
 
         Game g1 = new Game();
