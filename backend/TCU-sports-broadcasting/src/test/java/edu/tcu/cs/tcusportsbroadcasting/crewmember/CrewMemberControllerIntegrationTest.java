@@ -2,6 +2,7 @@ package edu.tcu.cs.tcusportsbroadcasting.crewmember;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
+import edu.tcu.cs.tcusportsbroadcasting.availability.AvailabilityRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,9 +30,11 @@ class CrewMemberControllerIntegrationTest {
     @Autowired
     CrewMemberRepository crewMemberRepository;
 
+    @Autowired
+    AvailabilityRepository availabilityRepository;
+
     @Test
     void shouldCreateCrewMemberAndPersistToDatabase() throws Exception {
-        // Arrange
         CrewMemberDto dto = new CrewMemberDto();
         dto.setFirstName("Clark");
         dto.setLastName("Kent");
@@ -41,7 +44,6 @@ class CrewMemberControllerIntegrationTest {
         dto.setRole("USER");
         dto.setPosition(Arrays.asList("Camera", "EVS"));
 
-        // Act + Assert
         mockMvc.perform(post("/User/crewMember?token=test")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
@@ -54,7 +56,6 @@ class CrewMemberControllerIntegrationTest {
 
     @Test
     void shouldReturnCrewMemberByIdFromDatabase() throws Exception {
-        // Arrange: manually insert a crew member using the repository
         CrewMember cm = new CrewMember();
         cm.setFirstName("Bruce");
         cm.setLastName("Wayne");
@@ -64,9 +65,8 @@ class CrewMemberControllerIntegrationTest {
         cm.setRole("ADMIN");
         cm.setPosition(Arrays.asList("Producer", "EVS"));
 
-        cm = crewMemberRepository.save(cm); // get generated ID
+        cm = crewMemberRepository.save(cm);
 
-        // Act + Assert
         mockMvc.perform(get("/User/crewMember/{userId}", cm.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -79,7 +79,8 @@ class CrewMemberControllerIntegrationTest {
 
     @Test
     void shouldReturnAllCrewMembersFromDatabase() throws Exception {
-        // Clear and re-seed the DB
+        // Clear Availability first to avoid FK constraint violation
+        availabilityRepository.deleteAll();
         crewMemberRepository.deleteAll();
 
         CrewMember cm1 = new CrewMember();
@@ -112,6 +113,4 @@ class CrewMemberControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.length()").value(2))
                 .andExpect(jsonPath("$.data[0].fullName").value("John Doe"));
     }
-
-
 }
