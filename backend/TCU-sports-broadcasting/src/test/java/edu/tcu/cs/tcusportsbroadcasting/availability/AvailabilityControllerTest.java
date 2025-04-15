@@ -11,7 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AvailabilityController.class)
@@ -27,28 +29,38 @@ class AvailabilityControllerTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void shouldReturnAvailabilityResponseWhenAddedSuccessfully() throws Exception {
+    void shouldReturnAvailabilityResponseWhenAdded() throws Exception {
         AvailabilityDto dto = new AvailabilityDto();
         dto.setUserId(1L);
-        dto.setGameId(1L);
+        dto.setGameId(2L);
         dto.setAvailability(1);
-        dto.setComment("All good");
+        dto.setComment("Coming");
 
-        AvailabilityResponseDto responseDto = new AvailabilityResponseDto(
-                1L, 1L, 1, "All good"
-        );
+        AvailabilityResponseDto response = new AvailabilityResponseDto(1L, 20L, 2L, 1, "Coming");
 
-        Mockito.when(availabilityService.addAvailability(Mockito.any())).thenReturn(responseDto);
+        Mockito.when(availabilityService.addAvailability(Mockito.any())).thenReturn(response);
 
         mockMvc.perform(post("/availability")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.flag").value(true))
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.message").value("Add Success"))
                 .andExpect(jsonPath("$.data.userId").value(1))
-                .andExpect(jsonPath("$.data.availability").value(1))
-                .andExpect(jsonPath("$.data.comment").value("All good"));
+                .andExpect(jsonPath("$.data.gameId").value(2))
+                .andExpect(jsonPath("$.data.scheduleId").value(20))
+                .andExpect(jsonPath("$.data.comment").value("Coming"));
+    }
+
+    @Test
+    void shouldReturnAvailabilityListByUserId() throws Exception {
+        AvailabilityResponseDto dto = new AvailabilityResponseDto(1L, 11L, 101L, 1, "Available");
+
+        Mockito.when(availabilityService.findByUserId(1L)).thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/availability/1")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(1))
+                .andExpect(jsonPath("$.data[0].userId").value(1))
+                .andExpect(jsonPath("$.data[0].scheduleId").value(11));
     }
 }

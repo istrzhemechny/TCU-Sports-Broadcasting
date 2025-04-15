@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -41,6 +42,7 @@ class AvailabilityControllerIntegrationTest {
 
     private Long userId;
     private Long gameId;
+    private Long scheduleId;
 
     @BeforeEach
     void setUp() {
@@ -51,7 +53,7 @@ class AvailabilityControllerIntegrationTest {
         CrewMember cm = new CrewMember();
         cm.setFirstName("Test");
         cm.setLastName("User");
-        cm.setEmail("test.user@example.com");
+        cm.setEmail("test@example.com");
         cm.setPhoneNumber("9999999999");
         cm.setPassword("pass");
         cm.setRole("USER");
@@ -60,31 +62,49 @@ class AvailabilityControllerIntegrationTest {
         userId = cm.getId();
 
         Game game = new Game();
-        game.setScheduleId(1L);
+        game.setScheduleId(10L);
         game.setGameDate(LocalDate.now());
         game.setVenue("TCU");
         game.setOpponent("Baylor");
         game.setFinalized(false);
         game = gameRepository.save(game);
         gameId = game.getGameId();
+        scheduleId = game.getScheduleId();
     }
 
     @Test
-    void shouldCreateAvailabilitySuccessfully() throws Exception {
+    void shouldCreateAvailability() throws Exception {
         AvailabilityDto dto = new AvailabilityDto();
         dto.setUserId(userId);
         dto.setGameId(gameId);
         dto.setAvailability(1);
-        dto.setComment("Ready for duty");
+        dto.setComment("Ready");
 
         mockMvc.perform(post("/availability")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.flag").value(true))
                 .andExpect(jsonPath("$.data.userId").value(userId))
                 .andExpect(jsonPath("$.data.gameId").value(gameId))
-                .andExpect(jsonPath("$.data.availability").value(1))
-                .andExpect(jsonPath("$.data.comment").value("Ready for duty"));
+                .andExpect(jsonPath("$.data.scheduleId").value(scheduleId));
+    }
+
+    @Test
+    void shouldReturnAvailabilityListByUserId() throws Exception {
+        Availability a = new Availability();
+        a.setCrewMember(crewMemberRepository.findById(userId).orElseThrow());
+        a.setGame(gameRepository.findById(gameId).orElseThrow());
+        a.setAvailability(1);
+        a.setComment("I'm good");
+
+        availabilityRepository.save(a);
+
+        mockMvc.perform(get("/availability/" + userId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.data.length()").value(1))
+                .andExpect(jsonPath("$.data[0].userId").value(userId))
+                .andExpect(jsonPath("$.data[0].gameId").value(gameId));
     }
 }

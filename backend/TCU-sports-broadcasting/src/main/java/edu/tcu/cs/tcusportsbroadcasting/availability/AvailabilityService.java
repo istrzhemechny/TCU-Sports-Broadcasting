@@ -9,6 +9,9 @@ import edu.tcu.cs.tcusportsbroadcasting.gameschedule.Game;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.GameRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class AvailabilityService {
 
@@ -45,9 +48,26 @@ public class AvailabilityService {
 
         return new AvailabilityResponseDto(
                 member.getId(),
+                game.getScheduleId(),
                 game.getGameId(),
                 availability.getAvailability(),
                 availability.getComment()
         );
+    }
+
+    public List<AvailabilityResponseDto> findByUserId(Long userId) {
+        CrewMember member = crewMemberRepository.findById(userId)
+                .orElseThrow(() -> new AvailabilityUserNotFoundException(userId));
+
+        return availabilityRepository.findByCrewMember_Id(userId)
+                .stream()
+                .map(a -> new AvailabilityResponseDto(
+                        member.getId(),
+                        a.getGame().getScheduleId(),
+                        a.getGame().getGameId(),
+                        a.getAvailability(),
+                        a.getComment()
+                ))
+                .collect(Collectors.toList());
     }
 }
