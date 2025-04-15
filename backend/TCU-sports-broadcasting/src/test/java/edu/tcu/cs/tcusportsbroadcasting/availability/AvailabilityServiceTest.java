@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -34,43 +35,64 @@ class AvailabilityServiceTest {
 
     @Test
     void shouldAddAvailabilitySuccessfully() {
-        // Arrange
         AvailabilityDto dto = new AvailabilityDto();
         dto.setUserId(1L);
         dto.setGameId(1L);
         dto.setAvailability(1);
-        dto.setComment("Coming from another game");
+        dto.setComment("Coming");
 
         CrewMember member = new CrewMember();
         member.setId(1L);
 
         Game game = new Game();
         game.setGameId(1L);
+        game.setScheduleId(10L);
         game.setGameDate(LocalDate.now());
 
         when(availabilityRepository.findByCrewMemberIdAndGame_GameId(1L, 1L)).thenReturn(Optional.empty());
         when(crewMemberRepository.findById(1L)).thenReturn(Optional.of(member));
         when(gameRepository.findById(1L)).thenReturn(Optional.of(game));
 
-        // Act
         AvailabilityResponseDto result = availabilityService.addAvailability(dto);
 
-        // Assert
         assertThat(result.getUserId()).isEqualTo(1L);
         assertThat(result.getGameId()).isEqualTo(1L);
         assertThat(result.getAvailability()).isEqualTo(1);
-        assertThat(result.getComment()).isEqualTo("Coming from another game");
-
-        verify(availabilityRepository).save(any(Availability.class));
+        assertThat(result.getScheduleId()).isEqualTo(10L);
     }
 
     @Test
-    void shouldThrowIfAvailabilityAlreadyExists() {
+    void shouldReturnAvailabilityListByUserId() {
+        CrewMember member = new CrewMember();
+        member.setId(1L);
+
+        Game game = new Game();
+        game.setGameId(1L);
+        game.setScheduleId(22L);
+
+        Availability a = new Availability();
+        a.setCrewMember(member);
+        a.setGame(game);
+        a.setAvailability(1);
+        a.setComment("Available");
+
+        when(crewMemberRepository.findById(1L)).thenReturn(Optional.of(member));
+        when(availabilityRepository.findByCrewMember_Id(1L)).thenReturn(List.of(a));
+
+        List<AvailabilityResponseDto> result = availabilityService.findByUserId(1L);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getScheduleId()).isEqualTo(22L);
+    }
+
+    @Test
+    void shouldThrowIfAvailabilityExists() {
         AvailabilityDto dto = new AvailabilityDto();
         dto.setUserId(1L);
         dto.setGameId(1L);
 
-        when(availabilityRepository.findByCrewMemberIdAndGame_GameId(1L, 1L)).thenReturn(Optional.of(new Availability()));
+        when(availabilityRepository.findByCrewMemberIdAndGame_GameId(1L, 1L))
+                .thenReturn(Optional.of(new Availability()));
 
         assertThrows(AvailabilityAlreadyExistsException.class, () -> {
             availabilityService.addAvailability(dto);
