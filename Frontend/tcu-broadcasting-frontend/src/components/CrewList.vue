@@ -42,7 +42,7 @@
     methods: {
       async fetchCrewMembers() {
         try {
-          const response = await axios.get('http://localhost:8080/crewMember');
+          const response = await axios.get('http://localhost:8080/User/crewMember');
           if (response.data.flag && response.data.code === 200) {
             this.crewMembers = response.data.data;
           } else {
