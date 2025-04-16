@@ -25,20 +25,19 @@
           <thead>
             <tr>
               <th>Date</th>
-              <th>Time</th>
               <th>Opponent</th>
               <th>Venue</th>
-              <th>Required Crew</th>
+              <th>Finalized?</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="game in filteredGames" :key="game.gameId">
               <td>{{ formatDate(game.gameDate) }}</td>
-              <td>{{ game.gameTime }}</td>
               <td>{{ game.opponent }}</td>
               <td>{{ game.venue }}</td>
-              <td>{{ game.requiredCrew.join(', ') }}</td>
+              <td>{{ game.finalized ? 'Yes' : 'No' }}</td>
+              <!--<td>{{ game.requiredCrew.join(', ') }}</td>-->
               <td><button @click="viewDetails(game)" class="btn btn-info">View</button></td>
             </tr>
           </tbody>
@@ -49,12 +48,10 @@
         <div class="modal-content">
           <h2>Game Details</h2>
           <p><strong>Date:</strong> {{ formatDate(selectedGame.gameDate) }}</p>
-          <p><strong>Time:</strong> {{ selectedGame.gameTime }}</p>
           <p><strong>Opponent:</strong> {{ selectedGame.opponent }}</p>
           <p><strong>Venue:</strong> {{ selectedGame.venue }}</p>
-          <p><strong>Required Crew:</strong> {{ selectedGame.requiredCrew.join(', ') }}</p>
-          <p><strong>Reporting Time:</strong> {{ selectedGame.reportingTime }}</p>
-          <p><strong>Contact:</strong> {{ selectedGame.contact }}</p>
+          <!--<p><strong>Required Crew:</strong> {{ selectedGame.requiredCrew.join(', ') }}</p>-->
+          <p><strong>Finalized:</strong> {{ selectedGame.finalized ? 'Yes' : 'No' }}</p>
           <button @click="selectedGame = null" class="btn btn-secondary">Close</button>
         </div>
       </div>
@@ -62,6 +59,8 @@
   </template>
   
   <script>
+  import axios from 'axios';
+
   export default {
     data() {
       return {
@@ -93,33 +92,21 @@
       this.fetchGameSchedule();
     },
     methods: {
-      fetchGameSchedule() {
-        // Mocked game data
-        setTimeout(() => {
-          this.games = [
-            {
-              gameId: 1,
-              gameDate: '2024-09-07',
-              gameTime: '6:00 PM',
-              venue: 'Carter',
-              opponent: 'LIU',
-              requiredCrew: ['Announcer', 'Technician'],
-              reportingTime: '5:00 PM',
-              contact: 'game.manager@example.com'
-            },
-            {
-              gameId: 2,
-              gameDate: '2024-09-14',
-              gameTime: '7:30 PM',
-              venue: 'Carter',
-              opponent: 'UCF',
-              requiredCrew: ['Technician', 'Camera Crew'],
-              reportingTime: '6:15 PM',
-              contact: 'staff@example.com'
-            }
-          ];
+      async fetchGameSchedule() {
+        try {
+          const response = await axios.get('http://localhost:8080/gameSchedule/games');
+          if (response.data.flag && response.data.code === 200) {
+            this.games = response.data.data;
+          } else {
+            console.error('Failed to fetch games:', response.data.message);
+            this.games = [];
+          }
+        } catch (error) {
+          console.error('API error:', error);
+          this.games = [];
+        } finally {
           this.loading = false;
-        }, 800);
+        }
       },
       formatDate(date) {
         return new Date(date).toLocaleDateString();
