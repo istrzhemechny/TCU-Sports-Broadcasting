@@ -37,6 +37,9 @@
             </tbody>
           </table>
           <button type="submit" class="btn btn-primary">Submit Availability</button>
+          <div v-if="showWarning" class="alert alert-warning">
+            Please select at least one game before submitting your availability.
+          </div>
         </form>
       </div>
   
@@ -45,6 +48,7 @@
   </template>
   
   <script>
+  import axios from 'axios';
   export default {
     data() {
       return {
@@ -56,6 +60,7 @@
         selectedGames: [],
         comments: {},
         loading: true,
+        showWarning: false,
         submitted: false
       };
     },
@@ -66,8 +71,8 @@
       async loadData() {
         try {
           const [gamesRes, availRes] = await Promise.all([
-            this.mockGetAllGames(),
-            this.mockGetUserAvailability(this.userId, this.seasonId)
+            this.getAllGames(),
+            this.getUserAvailability(this.userId)
           ]);
   
           this.allGames = gamesRes.data;
@@ -81,84 +86,50 @@
           this.loading = false;
         }
       },
-      submitAvailability() {
-        const payload = this.selectedGames.map(gameId => ({
-          userId: this.userId,
-          gameId,
-          availability: true,
-          comment: this.comments[gameId] || null
-        }));
-  
-        console.log("Submitting availability:", payload);
-        this.submitted = true;
+      async submitAvailability() {
+        if (this.selectedGames.length === 0) {
+          this.showWarning = true;
+          return;
+        }
+
+        this.showWarning = false;
+
+        try {
+          const payloads = this.selectedGames.map(gameId => ({
+            userId: this.userId,
+            gameId,
+            availability: 1,
+            comment: this.comments[gameId] || null
+          }));
+
+          for (const payload of payloads) {
+            await axios.post('http://localhost:8080/availability', payload);
+          }
+
+          this.submitted = true;
+          this.loadData(); // Refresh list after submission
+        } catch (error) {
+          console.error("Error submitting availability:", error);
+        }
       },
       formatDate(date) {
         return new Date(date).toLocaleDateString();
       },
-      // Mock API methods
-      mockGetUserAvailability(userId, seasonId) {
-        return new Promise(resolve => {
-          setTimeout(() => {
-            resolve({
-              flag: true,
-              code: 200,
-              message: "Find Success",
-              data: [
-                {
-                  userId: 1,
-                  scheduleId: 1,
-                  gameId: 1,
-                  availability: true,
-                  comment: "Will be coming from another game"
-                },
-                {
-                  userId: 1,
-                  scheduleId: 2,
-                  gameId: 2,
-                  availability: true,
-                  comment: null
-                }
-              ]
-            });
-          }, 500);
-        });
+      async getUserAvailability(userId) {
+        const response = await axios.get(`http://localhost:8080/availability/${userId}`);
+        if (response.data.flag && response.data.code === 200) {
+          return response.data;
+        } else {
+          throw new Error("Failed to fetch availability");
+        }
       },
-      mockGetAllGames() {
-        return new Promise(resolve => {
-          setTimeout(() => {
-            resolve({
-              flag: true,
-              code: 200,
-              message: "Find Success",
-              data: [
-                {
-                  gameId: 1,
-                  scheduleId: 1,
-                  gameDate: "2024-09-07",
-                  venue: "Carter",
-                  opponent: "LIU",
-                  isFinalized: false
-                },
-                {
-                  gameId: 2,
-                  scheduleId: 2,
-                  gameDate: "2024-09-14",
-                  venue: "Carter",
-                  opponent: "UCF",
-                  isFinalized: false
-                },
-                {
-                  gameId: 3,
-                  scheduleId: 3,
-                  gameDate: "2024-09-21",
-                  venue: "Carter",
-                  opponent: "Texas",
-                  isFinalized: false
-                }
-              ]
-            });
-          }, 500);
-        });
+      async getAllGames() {
+        const response = await axios.get('http://localhost:8080/gameSchedule/games');
+        if (response.data.flag && response.data.code === 200) {
+          return response.data;
+        } else {
+          throw new Error("Failed to fetch games");
+        }
       }
     }
   };
@@ -186,6 +157,10 @@
   .availability-table th {
     background-color: #f3e8ff;
   }
+  .availability-table td:first-child {
+    text-align: center;
+  }
+
 
   .input {
     width: 95%;
@@ -221,6 +196,15 @@
     padding: 10px;
     border-radius: 6px;
     border: 1px solid #facc15;
+  }
+  .alert-warning {
+    background-color: #fef3c7;
+    color: #d61919;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 20px;
+    border: 1px solid #d61919;
   }
   </style>
   
