@@ -7,21 +7,37 @@
         <table class="crew-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Full Name</th>
-              <th>Email</th>
-              <th>Phone Number</th>
+              <th>Crew Members</th>
+              <th>Details</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="member in crewMembers" :key="member.userId">
-              <td>{{ member.userId }}</td>
-              <td>{{ member.fullName }}</td>
-              <td>{{ member.email }}</td>
-              <td>{{ member.phoneNumber }}</td>
+              <td>{{ member.fullName}}</td>
+              <td><button @click="selectMember(member)">View Details</button></td>
             </tr>
           </tbody>
         </table>
+
+        <div v-if="selectedMember" class="modal-overlay" @click.self="selectedMember = null">
+          <div class="modal-content">
+            <h2>Crew Member Details</h2>
+            <p><strong>Full Name:</strong> {{ selectedMember.firstName }} {{ selectedMember.lastName }}</p>
+            <p><strong>Email:</strong> {{ selectedMember.email }}</p>
+            <p><strong>Phone Number:</strong> {{ selectedMember.phoneNumber }}</p>
+            
+            <div v-if="selectedMember.position && selectedMember.position.length">
+              <p><strong>Positions:</strong></p>
+              <ul>
+                <li v-for="(pos, index) in selectedMember.position" :key="index">{{ pos }}</li>
+              </ul>
+            </div>
+
+            <button @click="selectedMember = null">Close</button>
+          </div>
+        </div>
+
+
       </div>
     </div>
   </template>
@@ -33,7 +49,8 @@
     data() {
       return {
         crewMembers: [],
-        loading: true
+        loading: true,
+        selectedMember: null
       };
     },
     created() {
@@ -52,6 +69,19 @@
           console.error("API error:", error);
         } finally {
           this.loading = false;
+        }
+      },
+
+      async selectMember(member) {
+        try {
+          const response = await axios.get(`http://localhost:8080/User/crewMember/${member.userId}`);
+          if (response.data.flag && response.data.code === 200) {
+            this.selectedMember = response.data.data;
+          } else {
+            console.error("Failed to fetch member details:", response.data.message);
+          }
+        } catch (error) {
+          console.error("Error fetching member by ID:", error);
         }
       }
     }
@@ -73,6 +103,7 @@
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    margin-right: 60px;
   }
   .crew-table th, .crew-table td {
     padding: 12px;
@@ -87,5 +118,27 @@
     font-weight: bold;
     color: #6b21a8;
   }
+  .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 25px;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  text-align: left;
+}
   </style>
   
