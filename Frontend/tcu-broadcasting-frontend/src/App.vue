@@ -3,7 +3,7 @@
     <Banner></Banner>
     <div class="content">
       <NavigationBar></NavigationBar>
-      <GameSchedule></GameSchedule>
+      <AvailabilityTable></AvailabilityTable>
     </div>
   </header>
 
