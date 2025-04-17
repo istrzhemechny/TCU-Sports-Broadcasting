@@ -2,8 +2,11 @@
   <header>
     <Banner></Banner>
     <div class="content">
+    <!--
       <NavigationBar></NavigationBar>
       <AvailabilityTable></AvailabilityTable>
+    -->
+      <RegistrationForm></RegistrationForm>
     </div>
   </header>
 
@@ -18,6 +21,7 @@ import GameSchedule from './components/GameSchedule.vue';
 import NavigationBar from './components/NavigationBar.vue'
 import CrewList from './components/CrewList.vue';
 import Banner from './components/Banner.vue';
+import RegistrationForm from './components/RegistrationForm.vue';
 </script>
 
 <style scoped>
