@@ -53,7 +53,6 @@
     data() {
       return {
         userId: 1,
-        seasonId: 1,
         allGames: [],
         existingAvailability: [],
         gamesToSubmit: [],
