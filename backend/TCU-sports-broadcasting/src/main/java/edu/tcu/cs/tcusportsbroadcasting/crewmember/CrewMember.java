@@ -1,5 +1,8 @@
 package edu.tcu.cs.tcusportsbroadcasting.crewmember;
+import edu.tcu.cs.tcusportsbroadcasting.availability.Availability;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,6 +29,9 @@ public class CrewMember {
     @CollectionTable(name = "crew_member_positions", joinColumns = @JoinColumn(name = "crew_member_id"))
     @Column(name = "position")
     private List<String> position;
+
+    @OneToMany(mappedBy = "crewMember", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Availability> availabilities = new ArrayList<>();
 
     // Getters and Setters
 
