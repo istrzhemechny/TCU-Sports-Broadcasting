@@ -60,7 +60,7 @@ class CrewMemberControllerTest {
                 .thenReturn(responseDto);
 
         // Act + Assert
-        mockMvc.perform(post("/User/crewMember?token=test-token")
+        mockMvc.perform(post("/user/crewMember?token=test-token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -88,7 +88,7 @@ class CrewMemberControllerTest {
         Mockito.when(crewMemberService.findById(id)).thenReturn(responseDto);
 
         // Act + Assert
-        mockMvc.perform(get("/User/crewMember/{userId}", id)
+        mockMvc.perform(get("/user/crewMember/{userId}", id)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flag").value(true))
@@ -108,7 +108,7 @@ class CrewMemberControllerTest {
 
         Mockito.when(crewMemberService.findAll()).thenReturn(List.of(cm1, cm2));
 
-        mockMvc.perform(get("/User/crewMember")
+        mockMvc.perform(get("/user/crewMember")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flag").value(true))
@@ -125,7 +125,7 @@ class CrewMemberControllerTest {
         doNothing().when(crewMemberService).deleteCrewMember(userId);
 
         // Act + Assert
-        mockMvc.perform(delete("/User/crewMember/{userId}", userId))
+        mockMvc.perform(delete("/user/crewMember/{userId}", userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flag").value(true))
                 .andExpect(jsonPath("$.code").value(200))
@@ -140,7 +140,7 @@ class CrewMemberControllerTest {
         doThrow(new CrewMemberNotFoundException(userId)).when(crewMemberService).deleteCrewMember(userId);
 
         // Act + Assert
-        mockMvc.perform(delete("/User/crewMember/{userId}", userId))
+        mockMvc.perform(delete("/user/crewMember/{userId}", userId))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.flag").value(false))
                 .andExpect(jsonPath("$.code").value(404))

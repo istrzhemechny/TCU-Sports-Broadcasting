@@ -80,7 +80,7 @@ class AvailabilityControllerIntegrationTest {
         dto.setAvailability(1);
         dto.setComment("Ready");
 
-        mockMvc.perform(post("/availability")
+        mockMvc.perform(post("/availability/availability")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -99,7 +99,7 @@ class AvailabilityControllerIntegrationTest {
 
         availabilityRepository.save(a);
 
-        mockMvc.perform(get("/availability/" + userId)
+        mockMvc.perform(get("/availability/availability/" + userId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flag").value(true))

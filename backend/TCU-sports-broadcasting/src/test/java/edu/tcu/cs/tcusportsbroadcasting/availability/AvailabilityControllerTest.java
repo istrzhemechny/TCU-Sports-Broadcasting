@@ -40,7 +40,7 @@ class AvailabilityControllerTest {
 
         Mockito.when(availabilityService.addAvailability(Mockito.any())).thenReturn(response);
 
-        mockMvc.perform(post("/availability")
+        mockMvc.perform(post("/availability/availability")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -56,7 +56,7 @@ class AvailabilityControllerTest {
 
         Mockito.when(availabilityService.findByUserId(1L)).thenReturn(List.of(dto));
 
-        mockMvc.perform(get("/availability/1")
+        mockMvc.perform(get("/availability/availability/1")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(1))
