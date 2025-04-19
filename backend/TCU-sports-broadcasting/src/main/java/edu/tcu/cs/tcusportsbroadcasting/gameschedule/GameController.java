@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/gameSchedule")
+@RequestMapping("/game")
 public class GameController {
 
     private final GameService gameService;
@@ -17,7 +17,7 @@ public class GameController {
         this.gameService = gameService;
     }
 
-    @GetMapping("/games")
+    @GetMapping("/gameSchedule/games")
     public ResponseEntity<ApiResponse> findAllGames() {
         List<GameResponseDto> allGames = gameService.findAllGames();
 

@@ -19,14 +19,14 @@ public class AvailabilityController {
         this.availabilityService = availabilityService;
     }
 
-    @PostMapping
+    @PostMapping("/availability")
     public ResponseEntity<ApiResponse> addAvailability(@Valid @RequestBody AvailabilityDto dto) {
         AvailabilityResponseDto saved = availabilityService.addAvailability(dto);
         ApiResponse response = new ApiResponse(true, 200, "Add Success", saved);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping("/availability/{userId}")
     public ResponseEntity<ApiResponse> getAvailabilityByUser(@PathVariable Long userId) {
         List<AvailabilityResponseDto> availabilities = availabilityService.findByUserId(userId);
         ApiResponse response = new ApiResponse(true, 200, "Find Success", availabilities);

@@ -51,7 +51,7 @@ class CrewMemberControllerIntegrationTest {
         dto.setRole("USER");
         dto.setPosition(Arrays.asList("Camera", "EVS"));
 
-        mockMvc.perform(post("/User/crewMember?token=test")
+        mockMvc.perform(post("/user/crewMember?token=test")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -74,7 +74,7 @@ class CrewMemberControllerIntegrationTest {
 
         cm = crewMemberRepository.save(cm);
 
-        mockMvc.perform(get("/User/crewMember/{userId}", cm.getId())
+        mockMvc.perform(get("/user/crewMember/{userId}", cm.getId())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flag").value(true))
@@ -111,7 +111,7 @@ class CrewMemberControllerIntegrationTest {
         crewMemberRepository.save(cm1);
         crewMemberRepository.save(cm2);
 
-        mockMvc.perform(get("/User/crewMember")
+        mockMvc.perform(get("/user/crewMember")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flag").value(true))
@@ -150,7 +150,7 @@ class CrewMemberControllerIntegrationTest {
         availabilityRepository.save(a);
 
         // Act + Assert
-        mockMvc.perform(delete("/User/crewMember/" + cm.getId()))
+        mockMvc.perform(delete("/user/crewMember/" + cm.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Delete Success"));
 

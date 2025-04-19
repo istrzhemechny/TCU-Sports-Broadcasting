@@ -42,7 +42,7 @@ class GameControllerTest {
         Mockito.when(gameService.findAllGames()).thenReturn(List.of(g1, g2));
 
         // Act & Assert
-        mockMvc.perform(get("/gameSchedule/games")
+        mockMvc.perform(get("/game/gameSchedule/games")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flag").value(true))

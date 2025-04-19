@@ -58,7 +58,7 @@ class GameControllerIntegrationTest {
 
     @Test
     void shouldReturnAllGamesFromDatabase() throws Exception {
-        mockMvc.perform(get("/gameSchedule/games")
+        mockMvc.perform(get("/game/gameSchedule/games")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flag").value(true))
