@@ -1,8 +1,11 @@
 package edu.tcu.cs.tcusportsbroadcasting.crewmember;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.tcu.cs.tcusportsbroadcasting.availability.Availability;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
 import edu.tcu.cs.tcusportsbroadcasting.availability.AvailabilityRepository;
+import edu.tcu.cs.tcusportsbroadcasting.gameschedule.Game;
+import edu.tcu.cs.tcusportsbroadcasting.gameschedule.GameRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -10,11 +13,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -32,6 +36,9 @@ class CrewMemberControllerIntegrationTest {
 
     @Autowired
     AvailabilityRepository availabilityRepository;
+
+    @Autowired
+    GameRepository gameRepository;
 
     @Test
     void shouldCreateCrewMemberAndPersistToDatabase() throws Exception {
@@ -113,4 +120,42 @@ class CrewMemberControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.length()").value(2))
                 .andExpect(jsonPath("$.data[0].fullName").value("John Doe"));
     }
+
+    @Test
+    void shouldDeleteCrewMemberAndCascadeAvailability() throws Exception {
+        // Arrange: Create a crew member and related availability
+        CrewMember cm = new CrewMember();
+        cm.setFirstName("Tony");
+        cm.setLastName("Stark");
+        cm.setEmail("ironman@avengers.com");
+        cm.setPhoneNumber("9999999999");
+        cm.setPassword("arc");
+        cm.setRole("ADMIN");
+        cm.setPosition(List.of("Director"));
+        cm = crewMemberRepository.save(cm);
+
+        Game game = new Game();
+        game.setScheduleId(99L);
+        game.setGameDate(LocalDate.now());
+        game.setVenue("NYC");
+        game.setOpponent("Thanos");
+        game.setFinalized(false);
+        game = gameRepository.save(game);
+
+        Availability a = new Availability();
+        a.setCrewMember(cm);
+        a.setGame(game);
+        a.setAvailability(1);
+        a.setComment("Ready to fly");
+        availabilityRepository.save(a);
+
+        // Act + Assert
+        mockMvc.perform(delete("/User/crewMember/" + cm.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Delete Success"));
+
+        assertThat(crewMemberRepository.findById(cm.getId())).isEmpty();
+        assertThat(availabilityRepository.findByCrewMember_Id(cm.getId())).isEmpty();
+    }
+
 }

@@ -3,10 +3,8 @@ package edu.tcu.cs.tcusportsbroadcasting.crewmember;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberListDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
-import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMember;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailException;
-import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,5 +74,11 @@ public class CrewMemberService {
                 .collect(Collectors.toList());
     }
 
+    public void deleteCrewMember(Long userId) {
+        CrewMember member = crewMemberRepository.findById(userId)
+                .orElseThrow(() -> new CrewMemberNotFoundException(userId));
+
+        crewMemberRepository.delete(member); // Cascade delete handles availabilities
+    }
 
 }

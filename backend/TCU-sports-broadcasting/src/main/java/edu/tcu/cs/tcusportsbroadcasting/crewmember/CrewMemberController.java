@@ -66,5 +66,11 @@ public class CrewMemberController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/crewMember/{userId}")
+    public ResponseEntity<ApiResponse> deleteCrewMember(@PathVariable Long userId) {
+        crewMemberService.deleteCrewMember(userId);
+        ApiResponse response = new ApiResponse(true, 200, "Delete Success", null);
+        return ResponseEntity.ok(response);
+    }
 
 }

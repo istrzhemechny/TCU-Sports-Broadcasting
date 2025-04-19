@@ -3,7 +3,7 @@ package edu.tcu.cs.tcusportsbroadcasting.crewmember;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
-import org.junit.jupiter.api.Assertions;
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class CrewMemberServiceTest {
@@ -65,8 +66,8 @@ class CrewMemberServiceTest {
         when(crewMemberRepository.existsByEmail("already@used.com")).thenReturn(true);
 
         // expect
-        org.junit.jupiter.api.Assertions.assertThrows(
-                edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailException.class,
+        assertThrows(
+                DuplicateEmailException.class,
                 () -> crewMemberService.addCrewMember("token", dto)
         );
     }
@@ -101,9 +102,27 @@ class CrewMemberServiceTest {
         when(crewMemberRepository.findById(404L)).thenReturn(Optional.empty());
 
         // Assert
-        Assertions.assertThrows(CrewMemberNotFoundException.class, () -> {
+        assertThrows(CrewMemberNotFoundException.class, () -> {
             crewMemberService.findById(404L);
         });
+    }
+
+    @Test
+    void shouldDeleteCrewMemberByIdSuccessfully() {
+        CrewMember cm = new CrewMember();
+        cm.setId(1L);
+        when(crewMemberRepository.findById(1L)).thenReturn(Optional.of(cm));
+
+        crewMemberService.deleteCrewMember(1L);
+
+        verify(crewMemberRepository).delete(cm);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUserToDeleteNotFound() {
+        when(crewMemberRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(CrewMemberNotFoundException.class, () -> crewMemberService.deleteCrewMember(1L));
     }
 
 }

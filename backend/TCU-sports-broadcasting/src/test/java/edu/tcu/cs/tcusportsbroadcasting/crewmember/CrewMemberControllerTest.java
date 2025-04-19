@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberListDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CrewMemberController.class)
@@ -114,6 +116,36 @@ class CrewMemberControllerTest {
                 .andExpect(jsonPath("$.message").value("Find Success"))
                 .andExpect(jsonPath("$.data.length()").value(2))
                 .andExpect(jsonPath("$.data[0].fullName").value("John Doe"));
+    }
+
+    @Test
+    void shouldReturnSuccessResponseWhenDeletingCrewMember() throws Exception {
+        // Arrange
+        Long userId = 1L;
+        doNothing().when(crewMemberService).deleteCrewMember(userId);
+
+        // Act + Assert
+        mockMvc.perform(delete("/User/crewMember/{userId}", userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.message").value("Delete Success"))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenDeletingNonExistentUser() throws Exception {
+        // Arrange
+        Long userId = 999L;
+        doThrow(new CrewMemberNotFoundException(userId)).when(crewMemberService).deleteCrewMember(userId);
+
+        // Act + Assert
+        mockMvc.perform(delete("/User/crewMember/{userId}", userId))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.flag").value(false))
+                .andExpect(jsonPath("$.code").value(404))
+                .andExpect(jsonPath("$.message").value("Could not find user with id 999"))
+                .andExpect(jsonPath("$.data").isEmpty());
     }
 
 
