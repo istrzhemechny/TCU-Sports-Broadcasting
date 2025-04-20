@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-      <h1>Crew List</h1>
+      <h1>Crew Member List</h1>
   
       <div v-if="loading" class="loading">Loading crew members...</div>
       <div v-else>
@@ -59,7 +59,7 @@
     methods: {
       async fetchCrewMembers() {
         try {
-          const response = await axios.get('http://localhost:8080/User/crewMember');
+          const response = await axios.get('http://localhost:8080/user/crewMember');
           if (response.data.flag && response.data.code === 200) {
             this.crewMembers = response.data.data;
           } else {
@@ -74,7 +74,7 @@
 
       async selectMember(member) {
         try {
-          const response = await axios.get(`http://localhost:8080/User/crewMember/${member.userId}`);
+          const response = await axios.get(`http://localhost:8080/user/crewMember/${member.userId}`);
           if (response.data.flag && response.data.code === 200) {
             this.selectedMember = response.data.data;
           } else {
