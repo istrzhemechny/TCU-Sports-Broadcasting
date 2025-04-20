@@ -2,8 +2,8 @@
   <header>
     <Banner></Banner>
     <div class="content">
-      <NavigationBar></NavigationBar>
-      <CrewList></CrewList>
+      <NavigationBarAdmin></NavigationBarAdmin>
+      <CrewMemberList></CrewMemberList>
       
     </div>
   </header>
@@ -12,7 +12,8 @@
 <script setup>
 import AvailabilityTable from './components/AvailabilityTable.vue';
 import GameSchedule from './components/GameSchedule.vue';
-import NavigationBar from './components/NavigationBar.vue'
+import NavigationBarCrew from './components/NavigationBarCrew.vue'
+import NavigationBarAdmin from './components/NavigationBarAdmin.vue'
 import CrewMemberList from './components/CrewMemberList.vue';
 import CrewList from './components/CrewList.vue';
 import Banner from './components/Banner.vue';

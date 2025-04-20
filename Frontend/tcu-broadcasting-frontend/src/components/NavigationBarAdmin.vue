@@ -1,8 +1,13 @@
 <template>
   <div class="side-banner">
     <div class="nav-link active">View Game Schedule</div>
-    <div class="nav-link">Crew List</div>
-    <div class="nav-link">Submit Availability</div>
+    <div class="nav-link">View Crew Members</div>
+    <div class="nav-link">View Game Crew Lists</div>
+    <!-- Invite, Delete Crew Members-->
+    <div class="nav-link"> Manage Crew Members</div>
+    <div class="nav-link"> Manage Game Schedules</div>
+    <div class="nav-link"> Schedule Crew </div>
+
   </div>
 </template>
 
