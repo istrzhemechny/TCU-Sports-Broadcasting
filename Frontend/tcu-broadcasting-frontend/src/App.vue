@@ -1,18 +1,14 @@
 <template>
   <header>
     <Banner></Banner>
-    <div class="content">
-    <!--
+    <Login></Login>
+    <!--<div class="content">
       <NavigationBar></NavigationBar>
       <AvailabilityTable></AvailabilityTable>
-    -->
       <RegistrationForm></RegistrationForm>
     </div>
+    -->
   </header>
-
-  <main>
-    <TheWelcome />
-  </main>
 </template>
 
 <script setup>
@@ -22,6 +18,7 @@ import NavigationBar from './components/NavigationBar.vue'
 import CrewList from './components/CrewList.vue';
 import Banner from './components/Banner.vue';
 import RegistrationForm from './components/RegistrationForm.vue';
+import Login from './components/Login.vue';
 </script>
 
 <style scoped>
