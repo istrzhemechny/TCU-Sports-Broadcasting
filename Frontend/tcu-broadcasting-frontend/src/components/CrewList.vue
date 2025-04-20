@@ -1,144 +1,162 @@
 <template>
-    <div class="container">
-      <h1>Crew List</h1>
-  
-      <div v-if="loading" class="loading">Loading crew members...</div>
-      <div v-else>
-        <table class="crew-table">
-          <thead>
-            <tr>
-              <th>Crew Members</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="member in crewMembers" :key="member.userId">
-              <td>{{ member.fullName}}</td>
-              <td><button @click="selectMember(member)">View Details</button></td>
-            </tr>
-          </tbody>
-        </table>
+    <div class="crew-list-wrapper">
+        <div class="dropdown-wrapper">
+            <h2>Select a Game to View Crew List</h2>
 
-        <div v-if="selectedMember" class="modal-overlay" @click.self="selectedMember = null">
-          <div class="modal-content">
-            <h2>Crew Member Details</h2>
-            <p><strong>Full Name:</strong> {{ selectedMember.firstName }} {{ selectedMember.lastName }}</p>
-            <p><strong>Email:</strong> {{ selectedMember.email }}</p>
-            <p><strong>Phone Number:</strong> {{ selectedMember.phoneNumber }}</p>
-            
-            <div v-if="selectedMember.position && selectedMember.position.length">
-              <p><strong>Positions:</strong></p>
-              <ul>
-                <li v-for="(pos, index) in selectedMember.position" :key="index">{{ pos }}</li>
-              </ul>
+            <div v-if="loadingGames">Loading games...</div>
+            <div v-else>
+                <select v-model="selectedGameId" @change="fetchCrewList">
+                <option disabled value="">Please select a game</option>
+                <option v-for="game in games" :key="game.gameId" :value="game.gameId">
+                    {{ game.gameDate }} vs {{ game.opponent }} at {{ game.venue }}
+                </option>
+                </select>
             </div>
-
-            <button @click="selectedMember = null">Close</button>
-          </div>
         </div>
 
-
+  
+      <div v-if="crewDetails">
+        <h2>Crew List Details</h2>
+        <div class="crew-list-details-container">
+            <p><strong>Sport:</strong> Football</p> <!-- Static -->
+            <p><strong>Opponent:</strong> {{ crewDetails.opponent }}</p>
+            <p><strong>Game Date:</strong> {{ crewDetails.gameDate }}</p>
+            <p><strong>Game Time:</strong> {{ crewDetails.gameStart }}</p>
+            <p><strong>Venue:</strong> {{ crewDetails.venue }}</p>
+    
+            <table class="crew-table">
+            <thead>
+                <tr>
+                <th>Position</th>
+                <th>Name</th>
+                <th>Report Time</th>
+                <th>Report Location</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="member in crewDetails.crewedMembers" :key="member.crewedUserId">
+                <td>{{ member.Position }}</td>
+                <td>{{ member.fullName }}</td>
+                <td>{{ member.ReportTime }}</td>
+                <td>{{ member.ReportLocation }}</td>
+                </tr>
+            </tbody>
+            </table>
+        </div>
+       
+      </div>
+  
+      <div v-if="errorMessage" class="error-message">
+        {{ errorMessage }}
       </div>
     </div>
   </template>
   
   <script>
-  import axios from 'axios';
-
+  import axios from 'axios'
+  
   export default {
+    name: 'ViewCrewList',
     data() {
       return {
-        crewMembers: [],
-        loading: true,
-        selectedMember: null
-      };
+        games: [],
+        selectedGameId: '',
+        crewDetails: null,
+        loadingGames: true,
+        errorMessage: ''
+      }
     },
-    created() {
-      this.fetchCrewMembers();
-    },
+
     methods: {
-      async fetchCrewMembers() {
+      async fetchGames() {
         try {
-          const response = await axios.get('http://localhost:8080/User/crewMember');
+          const response = await axios.get('http://localhost:8080/gameSchedule/games')
           if (response.data.flag && response.data.code === 200) {
-            this.crewMembers = response.data.data;
-          } else {
-            console.error("Failed to fetch crew members:", response.data.message);
+            this.games = response.data.data
           }
         } catch (error) {
-          console.error("API error:", error);
+          this.errorMessage = 'Failed to load games.'
         } finally {
-          this.loading = false;
+          this.loadingGames = false
         }
       },
-
-      async selectMember(member) {
+      async fetchCrewList() {
+        this.crewDetails = null
+        this.errorMessage = ''
+  
         try {
-          const response = await axios.get(`http://localhost:8080/User/crewMember/${member.userId}`);
+          const response = await axios.get(`http://localhost:8080/crewList/${this.selectedGameId}`)
           if (response.data.flag && response.data.code === 200) {
-            this.selectedMember = response.data.data;
+            this.crewDetails = response.data.data
           } else {
-            console.error("Failed to fetch member details:", response.data.message);
+            this.errorMessage = response.data.message || 'Failed to retrieve crew list.'
           }
         } catch (error) {
-          console.error("Error fetching member by ID:", error);
+          this.errorMessage = 'An error occurred while fetching the crew list.'
         }
       }
+    },
+
+
+
+
+
+
+
+
+
+    mounted() {
+      this.fetchGames()
     }
-  };
+  }
   </script>
   
   <style scoped>
-  .container {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    max-width: 800px;
-    margin-left: 30px;
-    background-color: white;
+  .crew-list-wrapper {
+    width: 130vh;
+    font-family: 'Inter', sans-serif;
+    padding: 1.5rem;
+    text-align: center;
   }
-  h1{
-    color: #4D1979;
+
+  .dropdown-wrapper{
+    text-align: center;
   }
+
+  .crew-list-details-container{
+    border: solid rgb(183, 182, 182) 1.5px;
+    border-radius: 10px;
+    text-align: left;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: 1rem;
+  }
+  
+  select {
+    padding: 0.5rem;
+    font-size: 1rem;
+    margin: 1rem 0;
+  }
+  
   .crew-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
-    margin-right: 60px;
+    margin-top: 1rem;
   }
+  
   .crew-table th, .crew-table td {
-    padding: 12px;
+    border: 1px solid #ccc;
+    padding: 0.5rem;
     text-align: left;
-    border-bottom: 1px solid #ddd;
   }
+  
   .crew-table th {
-    background-color: #f3e8ff;
+    background-color: #f3f3f3;
   }
-  .loading {
-    font-size: 16px;
-    font-weight: bold;
-    color: #6b21a8;
+  
+  .error-message {
+    color: red;
+    margin-top: 1rem;
   }
-  .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background-color: white;
-  padding: 25px;
-  border-radius: 8px;
-  width: 400px;
-  max-width: 90%;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  text-align: left;
-}
   </style>
   
