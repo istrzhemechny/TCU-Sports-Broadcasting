@@ -6,7 +6,6 @@ import edu.tcu.cs.tcusportsbroadcasting.availability.exception.AvailabilityUserN
 import edu.tcu.cs.tcusportsbroadcasting.common.ApiResponse;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailException;
-import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -77,5 +76,4 @@ public class GlobalExceptionHandler {
     public ApiResponse handleDuplicate(AvailabilityAlreadyExistsException ex) {
         return new ApiResponse(false, 409, ex.getMessage(), null);
     }
-
 }
