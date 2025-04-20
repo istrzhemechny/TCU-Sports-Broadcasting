@@ -3,8 +3,7 @@
     <Banner></Banner>
     <div class="content">
       <NavigationBarAdmin></NavigationBarAdmin>
-      <CrewMemberList></CrewMemberList>
-      
+      <ManageCrew></ManageCrew>
     </div>
   </header>
 </template>
@@ -19,6 +18,7 @@ import CrewList from './components/CrewList.vue';
 import Banner from './components/Banner.vue';
 import RegistrationForm from './components/RegistrationForm.vue';
 import Login from './components/Login.vue';
+import ManageCrew from './components/ManageCrew.vue';
 </script>
 
 <style scoped>
