@@ -1,5 +1,6 @@
 package edu.tcu.cs.tcusportsbroadcasting.crewschedule;
 
+import edu.tcu.cs.tcusportsbroadcasting.crewschedule.dto.CrewListResponseDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewschedule.dto.CrewScheduleDto;
 import edu.tcu.cs.tcusportsbroadcasting.common.ApiResponse;
 import jakarta.validation.Valid;
@@ -23,6 +24,13 @@ public class CrewScheduleController {
                                                        @RequestBody @Valid List<CrewScheduleDto> dtoList) {
         List<CrewScheduleDto> result = crewScheduleService.addCrewSchedule(gameId, dtoList);
         ApiResponse response = new ApiResponse(true, 200, "Add Success", result);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/crewList/crewList/{gameId}")
+    public ResponseEntity<ApiResponse> getCrewListByGameId(@PathVariable Long gameId) {
+        CrewListResponseDto result = crewScheduleService.findCrewListByGameId(gameId);
+        ApiResponse response = new ApiResponse(true, 200, "Find Success", result);
         return ResponseEntity.ok(response);
     }
 }

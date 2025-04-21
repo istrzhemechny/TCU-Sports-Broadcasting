@@ -3,6 +3,7 @@ package edu.tcu.cs.tcusportsbroadcasting.crewschedule;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMember;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMemberRepository;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
+import edu.tcu.cs.tcusportsbroadcasting.crewschedule.dto.CrewListResponseDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewschedule.dto.CrewScheduleDto;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.Game;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.GameRepository;
@@ -61,5 +62,34 @@ public class CrewScheduleService {
         }
 
         return result;
+    }
+
+    public CrewListResponseDto findCrewListByGameId(Long gameId) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new GameNotFoundException(gameId));
+
+        List<CrewSchedule> scheduled = crewScheduleRepository.findByGame_GameId(gameId);
+
+        List<CrewScheduleDto> crewedMembers = scheduled.stream().map(cs -> {
+            CrewMember member = cs.getCrewMember();
+            CrewScheduleDto dto = new CrewScheduleDto();
+            dto.setCrewedUserId(cs.getCrewedUserId());
+            dto.setUserId(member.getId());
+            dto.setGameId(gameId);
+            dto.setPosition(cs.getPosition());
+            dto.setFullName(member.getFirstName() + " " + member.getLastName());
+            dto.setReportTime(cs.getReportTime());
+            dto.setReportLocation(cs.getReportLocation());
+            return dto;
+        }).toList();
+
+        return new CrewListResponseDto(
+                game.getGameId(),
+                null, // placeholder for gameStart (not implemented in entity)
+                game.getGameDate(),
+                game.getVenue(),
+                game.getOpponent(),
+                crewedMembers
+        );
     }
 }
