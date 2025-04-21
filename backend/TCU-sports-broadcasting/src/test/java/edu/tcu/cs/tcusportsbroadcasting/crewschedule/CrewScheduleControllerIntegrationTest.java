@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,6 +35,9 @@ class CrewScheduleControllerIntegrationTest {
 
     @Autowired
     private CrewMemberRepository crewMemberRepository;
+
+    @Autowired
+    private CrewScheduleRepository crewScheduleRepository;
 
     @Test
     void shouldAddCrewScheduleAndReturnSuccess() throws Exception {
@@ -116,4 +120,42 @@ class CrewScheduleControllerIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Provided arguments are invalid, see data for details."))
                 .andExpect(jsonPath("$.data.position").value("Position is required"));
     }
+
+    @Test
+    void shouldReturnCrewListByGameId() throws Exception {
+        Game game = new Game();
+        game.setGameDate(LocalDate.of(2025, 11, 1));
+        game.setVenue("Amon G. Carter Stadium");
+        game.setOpponent("Texas Longhorns");
+        game.setFinalized(true);
+        game = gameRepository.save(game);
+
+        CrewMember cm = new CrewMember();
+        cm.setFirstName("John");
+        cm.setLastName("Smith");
+        cm.setEmail("john@tcu.edu");
+        cm.setPhoneNumber("1234567890");
+        cm.setPassword("pass");
+        cm.setRole("USER");
+        cm.setPosition(List.of("DIRECTOR"));
+        cm = crewMemberRepository.save(cm);
+
+        CrewSchedule cs = new CrewSchedule();
+        cs.setCrewMember(cm);
+        cs.setGame(game);
+        cs.setPosition("DIRECTOR");
+        cs.setReportTime("12:00");
+        cs.setReportLocation("CONTROL ROOM");
+        crewScheduleRepository.save(cs);
+
+        mockMvc.perform(get("/crewSchedule/crewList/crewList/" + game.getGameId())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.gameId").value(game.getGameId()))
+                .andExpect(jsonPath("$.data.crewedMembers.length()").value(1))
+                .andExpect(jsonPath("$.data.crewedMembers[0].position").value("DIRECTOR"));
+    }
+
 }
