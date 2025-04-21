@@ -7,6 +7,7 @@ import edu.tcu.cs.tcusportsbroadcasting.common.ApiResponse;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailException;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.exception.GameNotFoundException;
+import edu.tcu.cs.tcusportsbroadcasting.gameschedule.exception.ScheduleNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -89,6 +90,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse> handleGameNotFound(GameNotFoundException ex) {
         ApiResponse response = new ApiResponse(false, 404, ex.getMessage(), null);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(ScheduleNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiResponse handleScheduleNotFound(ScheduleNotFoundException ex) {
+        return new ApiResponse(false, 404, ex.getMessage(), null);
     }
 
     @ExceptionHandler(HandlerMethodValidationException.class)

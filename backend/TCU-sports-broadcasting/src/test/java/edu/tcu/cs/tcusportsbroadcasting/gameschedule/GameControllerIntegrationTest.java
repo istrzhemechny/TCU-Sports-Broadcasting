@@ -17,6 +17,8 @@ import java.time.LocalDate;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -33,6 +35,9 @@ class GameControllerIntegrationTest {
 
     @Autowired
     private CrewScheduleRepository crewScheduleRepository;
+
+    @Autowired
+    private GameScheduleRepository gameScheduleRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -72,4 +77,29 @@ class GameControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.length()").value(2))
                 .andExpect(jsonPath("$.data[0].opponent").value("LIU"));
     }
+
+    @Test
+    void shouldAddGameToScheduleSuccessfully() throws Exception {
+        GameSchedule schedule = new GameSchedule("Basketball", "2024-2025");
+        schedule = gameScheduleRepository.save(schedule); // must exist
+
+        String requestJson = """
+    {
+      "gameDate": "2025-10-10",
+      "venue": "Amon G. Carter Stadium",
+      "opponent": "Texas Longhorns",
+      "isFinalized": true
+    }
+    """;
+
+        mockMvc.perform(post("/game/schedule/gameSchedule/" + schedule.getId() + "/games")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.venue").value("Amon G. Carter Stadium"))
+                .andExpect(jsonPath("$.data.scheduleId").value(schedule.getId()));
+    }
+
 }
