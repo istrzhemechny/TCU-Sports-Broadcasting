@@ -4,6 +4,8 @@ import edu.tcu.cs.tcusportsbroadcasting.availability.Availability;
 import edu.tcu.cs.tcusportsbroadcasting.availability.AvailabilityRepository;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMember;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMemberRepository;
+import edu.tcu.cs.tcusportsbroadcasting.crewschedule.CrewSchedule;
+import edu.tcu.cs.tcusportsbroadcasting.crewschedule.CrewScheduleRepository;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.Game;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.GameRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -22,10 +24,13 @@ public class DBDataInitializer implements CommandLineRunner {
 
     private final AvailabilityRepository availabilityRepository;
 
-    public DBDataInitializer(CrewMemberRepository crewMemberRepository, GameRepository gameRepository, AvailabilityRepository availabilityRepository) {
+    private final CrewScheduleRepository crewScheduleRepository;
+
+    public DBDataInitializer(CrewMemberRepository crewMemberRepository, GameRepository gameRepository, AvailabilityRepository availabilityRepository, CrewScheduleRepository crewScheduleRepository) {
         this.crewMemberRepository = crewMemberRepository;
         this.gameRepository = gameRepository;
         this.availabilityRepository = availabilityRepository;
+        this.crewScheduleRepository = crewScheduleRepository;
     }
 
     @Override
@@ -91,6 +96,24 @@ public class DBDataInitializer implements CommandLineRunner {
         a1.setComment("Can be there early");
 
         availabilityRepository.save(a1);
+
+        // Create some CrewSchedule records
+        CrewSchedule cs1 = new CrewSchedule();
+        cs1.setCrewMember(cm1);
+        cs1.setGame(g1);
+        cs1.setPosition("PRODUCER");
+        cs1.setReportLocation("Control Room");
+        cs1.setReportTime("5:30 PM");
+
+        CrewSchedule cs2 = new CrewSchedule();
+        cs2.setCrewMember(cm2);
+        cs2.setGame(g1);
+        cs2.setPosition("DIRECTOR");
+        cs2.setReportLocation("Control Room");
+        cs2.setReportTime("5:45 PM");
+
+        this.crewScheduleRepository.saveAll(List.of(cs1, cs2));
+
 
 
     }

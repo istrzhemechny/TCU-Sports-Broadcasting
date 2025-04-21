@@ -6,11 +6,19 @@ import edu.tcu.cs.tcusportsbroadcasting.availability.exception.AvailabilityUserN
 import edu.tcu.cs.tcusportsbroadcasting.common.ApiResponse;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailException;
+import edu.tcu.cs.tcusportsbroadcasting.gameschedule.exception.GameNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.BindingResult;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -76,4 +84,28 @@ public class GlobalExceptionHandler {
     public ApiResponse handleDuplicate(AvailabilityAlreadyExistsException ex) {
         return new ApiResponse(false, 409, ex.getMessage(), null);
     }
+
+    @ExceptionHandler(GameNotFoundException.class)
+    public ResponseEntity<ApiResponse> handleGameNotFound(GameNotFoundException ex) {
+        ApiResponse response = new ApiResponse(false, 404, ex.getMessage(), null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ApiResponse> handleHandlerMethodValidationException(HandlerMethodValidationException ex) {
+        Map<String, String> errors = new HashMap<>();
+
+        ex.getAllErrors().forEach(error -> {
+            if (error instanceof FieldError fieldError) {
+                errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+            } else {
+                errors.put(error.getDefaultMessage(), error.getDefaultMessage());
+            }
+        });
+
+        ApiResponse response = new ApiResponse(false, 400, "Provided arguments are invalid, see data for details.", errors);
+        return ResponseEntity.badRequest().body(response);
+    }
+
+
 }
