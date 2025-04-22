@@ -4,6 +4,7 @@ import edu.tcu.cs.tcusportsbroadcasting.common.ApiResponse;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberListDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.InviteRequestDto;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,5 +73,13 @@ public class CrewMemberController {
         ApiResponse response = new ApiResponse(true, 200, "Delete Success", null);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/invite")
+    public ResponseEntity<ApiResponse> inviteCrewMembers(@Valid @RequestBody InviteRequestDto dto) {
+        List<String> invited = crewMemberService.inviteCrewMembers(dto.getEmails());
+        ApiResponse response = new ApiResponse(true, 200, "Invite Success", invited);
+        return ResponseEntity.ok(response);
+    }
+
 
 }

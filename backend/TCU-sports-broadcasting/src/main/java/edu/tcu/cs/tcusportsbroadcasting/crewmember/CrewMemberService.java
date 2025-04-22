@@ -81,4 +81,8 @@ public class CrewMemberService {
         crewMemberRepository.delete(member); // Cascade delete handles availabilities
     }
 
+    public List<String> inviteCrewMembers(List<String> emails) {
+        // Later add hook in email logic or invitation token generation
+        return emails;
+    }
 }
