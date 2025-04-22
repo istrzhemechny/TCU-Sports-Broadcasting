@@ -199,7 +199,6 @@
     padding: 20px;
     max-width: 600px;
     margin: auto;
-    background-color: white;
   }
   .input {
     padding: 8px;

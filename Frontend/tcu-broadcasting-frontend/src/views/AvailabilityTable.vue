@@ -102,7 +102,7 @@
           }));
 
           for (const payload of payloads) {
-            await axios.post('http://localhost:8080/availability', payload);
+            await axios.post('http://localhost:8080/availability/availability', payload);
           }
 
           this.submitted = true;
@@ -115,7 +115,7 @@
         return new Date(date).toLocaleDateString();
       },
       async getUserAvailability(userId) {
-        const response = await axios.get(`http://localhost:8080/availability/${userId}`);
+        const response = await axios.get(`http://localhost:8080/availability/availability/${userId}`);
         if (response.data.flag && response.data.code === 200) {
           return response.data;
         } else {
@@ -123,7 +123,7 @@
         }
       },
       async getAllGames() {
-        const response = await axios.get('http://localhost:8080/gameSchedule/games');
+        const response = await axios.get('http://localhost:8080/game/gameSchedule/games');
         if (response.data.flag && response.data.code === 200) {
           return response.data;
         } else {
@@ -140,7 +140,9 @@
     max-width: 700px;
     margin-left: 30px;
     padding: 20px;
-    background: white;
+  }
+  h1{
+    color: #4D1979;
   }
   .availability-table {
     width: 100%;

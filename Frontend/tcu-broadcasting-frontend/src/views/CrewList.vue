@@ -70,7 +70,7 @@
     methods: {
       async fetchGames() {
         try {
-          const response = await axios.get('http://localhost:8080/gameSchedule/games')
+          const response = await axios.get('http://localhost:8080/game/gameSchedule/games')
           if (response.data.flag && response.data.code === 200) {
             this.games = response.data.data
           }
@@ -117,6 +117,10 @@
     font-family: 'Inter', sans-serif;
     padding: 1.5rem;
     text-align: center;
+  }
+
+  h2{
+    color: #4D1979;
   }
 
   .dropdown-wrapper{
