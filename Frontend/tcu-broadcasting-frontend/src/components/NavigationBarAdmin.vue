@@ -1,11 +1,12 @@
 <template>
   <div class="side-banner">
-    <div class="nav-link active">View Game Schedule</div>
-    <div class="nav-link">View Game Crew Lists</div>
+
+    <router-link class="nav-link" :to="{ name: 'gameSchedule' }">View Game Schedule</router-link>
+    <router-link class="nav-link" :to="{ name: 'crewList' }">View Game Crew Lists</router-link>
     <!-- Invite, Delete Crew Members-->
-    <div class="nav-link">Manage Crew Members</div>
-    <div class="nav-link"> Manage Game Schedules</div>
-    <div class="nav-link"> Schedule Crew </div>
+    <router-link class="nav-link" :to="{ name: 'manageCrewMembers' }">Manage Crew Members</router-link>
+    <router-link class="nav-link" :to="{ name: 'manageSchedules' }">Manage Game Schedules</router-link>
+    <router-link class="nav-link" :to="{ name: 'scheduleCrew' }">Schedule Crew</router-link>
 
   </div>
 </template>
@@ -18,24 +19,31 @@ export default {
 
 <style scoped>
 .side-banner {
-  width: 220px;
-  height: 74vh;
+  width: 235px;
+  height: calc(100vh - 135px);
   background-color: #4D1979;
   font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+
 }
+
 .nav-link {
-  padding: 18px;
-  background-color: transparent;
+  padding: 1.3rem;
   color: #ffffff;
-  font-weight: normal;
-  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.2s, color 0.2s;
   
 }
+
 .nav-link:hover {
   background-color: #ddd6fe;
   color: #4D1979;
 }
-.nav-link.active {
+
+.router-link-active {
   background-color: #cdcbd7;
   font-weight: bold;
   color: #4D1979;

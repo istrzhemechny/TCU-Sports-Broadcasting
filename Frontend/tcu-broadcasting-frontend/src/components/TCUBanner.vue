@@ -18,9 +18,10 @@
   .banner {
     width: 100%;
     background-color: #4D4D4A;
-    padding-bottom: 1.5rem;
+    padding-bottom: 25px;
     display: flex;
     align-items: flex-start;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
   
   .banner-content {
@@ -33,7 +34,9 @@
   .banner-logo {
     margin-left: 5rem;
     margin-right: 1rem;
-    width: 130px;
+    /*width: 130px;*/
+    /*height: 110px;*/
+    height: 110px
   }
   
   .banner-title {

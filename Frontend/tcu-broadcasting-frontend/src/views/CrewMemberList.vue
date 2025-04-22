@@ -94,7 +94,6 @@
     padding: 20px;
     max-width: 800px;
     margin-left: 30px;
-    background-color: white;
   }
   h1{
     color: #4D1979;

@@ -121,6 +121,7 @@
       },
       async performDeletion() {
         try {
+          console.log(`crewMember to delete is ${this.selectedMember.userId}`)
           await axios.delete(`http://localhost:8080/user/crewMember/${this.selectedMember.userId}`)
           this.crewMembers = this.crewMembers.filter(
             m => m.userId !== this.selectedMember.userId

@@ -1,4 +1,5 @@
 <template>
+  <TCUBanner></TCUBanner>
     <div class="login-wrapper">
       <div class="login-card">
         <h2>LOGIN</h2>
@@ -20,49 +21,32 @@
   </template>
   
   <script>
-  import axios from 'axios'
+  import { login, loginError } from '@/apis/auth'
+  import TCUBanner from '@/components/TCUBanner.vue'
   
   export default {
     name: 'LoginPage',
+    components: {
+      TCUBanner
+    },
     data() {
       return {
         email: '',
         password: '',
-        errorMessage: '',
+        errorMessage: ''
       }
     },
     methods: {
-        async handleLogin() {
-            this.errorMessage = ''
-
-            try {
-                const response = await axios.post('http://localhost:8080/auth/login', {
-                email: this.email,
-                password: this.password
-                }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-                })
-
-                const res = response.data
-
-                //work on with backend
-                if (res.flag && res.code === 200) {
-                //const { token, role, userId } = res.data
-                //localStorage.setItem('token', token)
-                //localStorage.setItem('userId', userId)
-                //localStorage.setItem('role', role)
-
-                this.$router.push('/dashboard')
-                } else {
-                this.errorMessage = res.message || 'Login failed.'
-                }
-            } catch (error) {
-                this.errorMessage = error.response?.data?.message || 'An unexpected error occurred.'
-            }
+      async handleLogin() {
+        await login(this.email, this.password)
+  
+        if (!loginError.value) {
+          const redirect = this.$route.query.redirect || { name: 'gameSchedule' }
+          this.$router.push(redirect)
+        } else {
+          this.errorMessage = loginError.value
         }
+      }
     }
   }
   </script>
@@ -74,7 +58,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 75vh;
+    min-height: calc(100vh - 135px);
     background-color: #4D1979;
     font-family: 'Inter', sans-serif;
   }
