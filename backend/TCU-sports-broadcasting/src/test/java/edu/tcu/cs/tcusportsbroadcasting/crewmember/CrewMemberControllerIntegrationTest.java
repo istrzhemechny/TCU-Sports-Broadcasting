@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.tcu.cs.tcusportsbroadcasting.availability.Availability;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
 import edu.tcu.cs.tcusportsbroadcasting.availability.AvailabilityRepository;
+import edu.tcu.cs.tcusportsbroadcasting.crewschedule.CrewScheduleRepository;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.Game;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.GameRepository;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,9 @@ class CrewMemberControllerIntegrationTest {
 
     @Autowired
     GameRepository gameRepository;
+
+    @Autowired
+    CrewScheduleRepository crewScheduleRepository;
 
     @Test
     void shouldCreateCrewMemberAndPersistToDatabase() throws Exception {
@@ -86,7 +90,7 @@ class CrewMemberControllerIntegrationTest {
 
     @Test
     void shouldReturnAllCrewMembersFromDatabase() throws Exception {
-        // Clear Availability first to avoid FK constraint violation
+        crewScheduleRepository.deleteAll();
         availabilityRepository.deleteAll();
         crewMemberRepository.deleteAll();
 

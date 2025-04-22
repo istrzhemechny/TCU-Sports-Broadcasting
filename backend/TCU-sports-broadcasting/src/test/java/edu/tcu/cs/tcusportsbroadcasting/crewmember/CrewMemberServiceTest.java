@@ -125,4 +125,17 @@ class CrewMemberServiceTest {
         assertThrows(CrewMemberNotFoundException.class, () -> crewMemberService.deleteCrewMember(1L));
     }
 
+    @Test
+    void shouldReturnListOfInvitedEmails() {
+        // Arrange
+        List<String> emails = List.of("john.smith@example.com", "jane.doe@example.com");
+
+        // Act
+        List<String> result = crewMemberService.inviteCrewMembers(emails);
+
+        // Assert
+        assertThat(result).isEqualTo(emails);
+    }
+
+
 }

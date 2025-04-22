@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberListDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.InviteRequestDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -146,6 +147,28 @@ class CrewMemberControllerTest {
                 .andExpect(jsonPath("$.code").value(404))
                 .andExpect(jsonPath("$.message").value("Could not find user with id 999"))
                 .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    void shouldInviteCrewMembersSuccessfully() throws Exception {
+        // Arrange
+        List<String> emails = List.of("john.smith@example.com", "jane.doe@example.com");
+        InviteRequestDto dto = new InviteRequestDto();
+        dto.setEmails(emails);
+
+        Mockito.when(crewMemberService.inviteCrewMembers(emails)).thenReturn(emails);
+
+        // Act & Assert
+        mockMvc.perform(post("/user/invite")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.flag").value(true))
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.message").value("Invite Success"))
+                .andExpect(jsonPath("$.data.length()").value(2))
+                .andExpect(jsonPath("$.data[0]").value("john.smith@example.com"))
+                .andExpect(jsonPath("$.data[1]").value("jane.doe@example.com"));
     }
 
 
