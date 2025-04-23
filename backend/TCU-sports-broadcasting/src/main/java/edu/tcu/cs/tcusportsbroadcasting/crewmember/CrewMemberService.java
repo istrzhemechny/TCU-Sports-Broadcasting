@@ -1,10 +1,12 @@
 package edu.tcu.cs.tcusportsbroadcasting.crewmember;
 
+import edu.tcu.cs.tcusportsbroadcasting.availability.AvailabilityRepository;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberListDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailException;
+import edu.tcu.cs.tcusportsbroadcasting.crewschedule.CrewScheduleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,8 +19,14 @@ public class CrewMemberService {
 
     private final CrewMemberRepository crewMemberRepository;
 
-    public CrewMemberService(CrewMemberRepository crewMemberRepository) {
+    private final CrewScheduleRepository crewScheduleRepository;
+
+    private final AvailabilityRepository availabilityRepository;
+
+    public CrewMemberService(CrewMemberRepository crewMemberRepository, CrewScheduleRepository crewScheduleRepository, AvailabilityRepository availabilityRepository) {
         this.crewMemberRepository = crewMemberRepository;
+        this.crewScheduleRepository = crewScheduleRepository;
+        this.availabilityRepository = availabilityRepository;
     }
 
     public CrewMemberResponseDto addCrewMember(String token, CrewMemberDto dto) {
@@ -78,8 +86,16 @@ public class CrewMemberService {
         CrewMember member = crewMemberRepository.findById(userId)
                 .orElseThrow(() -> new CrewMemberNotFoundException(userId));
 
-        crewMemberRepository.delete(member); // Cascade delete handles availabilities
+        // Delete related crew schedules first
+        crewScheduleRepository.deleteAllByCrewMember_Id(userId);
+
+        // Optionally delete related availability records
+        availabilityRepository.deleteAllByCrewMember_Id(userId);
+
+        // Now it's safe to delete the user so no error
+        crewMemberRepository.delete(member);
     }
+
 
     public List<String> inviteCrewMembers(List<String> emails) {
         // Later add hook in email logic or invitation token generation
