@@ -6,4 +6,7 @@ import java.util.List;
 
 public interface CrewScheduleRepository extends JpaRepository<CrewSchedule, Long> {
     List<CrewSchedule> findByGame_GameId(Long gameId);
+
+    void deleteAllByCrewMember_Id(Long userId);
+
 }
