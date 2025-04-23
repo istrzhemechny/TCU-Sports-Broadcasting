@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.tcu.cs.tcusportsbroadcasting.availability.Availability;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
 import edu.tcu.cs.tcusportsbroadcasting.availability.AvailabilityRepository;
+import edu.tcu.cs.tcusportsbroadcasting.crewschedule.CrewSchedule;
+import edu.tcu.cs.tcusportsbroadcasting.crewschedule.CrewScheduleRepository;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.Game;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.GameRepository;
 import org.junit.jupiter.api.Test;
@@ -39,6 +41,9 @@ class CrewMemberControllerIntegrationTest {
 
     @Autowired
     GameRepository gameRepository;
+
+    @Autowired
+    CrewScheduleRepository crewScheduleRepository;
 
     @Test
     void shouldCreateCrewMemberAndPersistToDatabase() throws Exception {
@@ -86,7 +91,7 @@ class CrewMemberControllerIntegrationTest {
 
     @Test
     void shouldReturnAllCrewMembersFromDatabase() throws Exception {
-        // Clear Availability first to avoid FK constraint violation
+        crewScheduleRepository.deleteAll();
         availabilityRepository.deleteAll();
         crewMemberRepository.deleteAll();
 
@@ -157,5 +162,55 @@ class CrewMemberControllerIntegrationTest {
         assertThat(crewMemberRepository.findById(cm.getId())).isEmpty();
         assertThat(availabilityRepository.findByCrewMember_Id(cm.getId())).isEmpty();
     }
+
+    @Test
+    void shouldDeleteCrewMemberAndCascadeDependencies() throws Exception {
+        // Arrange: Create an unsaved crew member object
+        CrewMember unsaved = new CrewMember();
+        unsaved.setFirstName("Tony");
+        unsaved.setLastName("Stark");
+        unsaved.setEmail("ironman@avengers.com");
+        unsaved.setPhoneNumber("9999999999");
+        unsaved.setPassword("arc");
+        unsaved.setRole("ADMIN");
+        unsaved.setPosition(List.of("Director"));
+
+        CrewMember cm = crewMemberRepository.save(unsaved);
+
+        Game game = new Game();
+        game.setScheduleId(99L);
+        game.setGameDate(LocalDate.now());
+        game.setVenue("NYC");
+        game.setOpponent("Thanos");
+        game.setFinalized(false);
+        game = gameRepository.save(game);
+
+        Availability a = new Availability();
+        a.setCrewMember(cm);
+        a.setGame(game);
+        a.setAvailability(1);
+        a.setComment("Ready to fly");
+        availabilityRepository.save(a);
+
+        CrewSchedule cs = new CrewSchedule();
+        cs.setCrewMember(cm);
+        cs.setGame(game);
+        cs.setPosition("DIRECTOR");
+        cs.setReportTime("5:30 PM");
+        cs.setReportLocation("Control Room");
+        crewScheduleRepository.save(cs);
+
+        mockMvc.perform(delete("/user/crewMember/" + cm.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Delete Success"));
+
+        // Assert availability and schedule entries are also deleted
+        assertThat(availabilityRepository.findByCrewMember_Id(cm.getId())).isEmpty();
+
+        assertThat(crewScheduleRepository.findAll().stream()
+                .noneMatch(s -> s.getCrewMember().getId().equals(cm.getId()))).isTrue();
+    }
+
+
 
 }

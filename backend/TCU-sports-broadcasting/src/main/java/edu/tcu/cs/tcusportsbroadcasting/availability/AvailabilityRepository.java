@@ -10,4 +10,6 @@ public interface AvailabilityRepository extends JpaRepository<Availability, Long
     Optional<Availability> findByCrewMemberIdAndGame_GameId(Long userId, Long gameId);
 
     List<Availability> findByCrewMember_Id(Long userId);
+
+    void deleteAllByCrewMember_Id(Long userId);
 }

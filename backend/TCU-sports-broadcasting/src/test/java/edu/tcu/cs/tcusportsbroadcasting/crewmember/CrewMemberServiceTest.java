@@ -1,9 +1,11 @@
 package edu.tcu.cs.tcusportsbroadcasting.crewmember;
 
+import edu.tcu.cs.tcusportsbroadcasting.availability.AvailabilityRepository;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailException;
+import edu.tcu.cs.tcusportsbroadcasting.crewschedule.CrewScheduleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,11 +23,23 @@ class CrewMemberServiceTest {
 
     private CrewMemberService crewMemberService;
 
+    private CrewScheduleRepository crewScheduleRepository;
+
+    private AvailabilityRepository availabilityRepository;
+
     @BeforeEach
     void setUp() {
         crewMemberRepository = mock(CrewMemberRepository.class);
-        crewMemberService = new CrewMemberService(crewMemberRepository);
+        crewScheduleRepository = mock(CrewScheduleRepository.class);
+        availabilityRepository = mock(AvailabilityRepository.class);
+
+        crewMemberService = new CrewMemberService(
+                crewMemberRepository,
+                crewScheduleRepository,
+                availabilityRepository
+        );
     }
+
 
     @Test
     void shouldAddNewCrewMemberSuccessfully() {
@@ -124,5 +138,34 @@ class CrewMemberServiceTest {
 
         assertThrows(CrewMemberNotFoundException.class, () -> crewMemberService.deleteCrewMember(1L));
     }
+
+    @Test
+    void shouldReturnListOfInvitedEmails() {
+        // Arrange
+        List<String> emails = List.of("john.smith@example.com", "jane.doe@example.com");
+
+        // Act
+        List<String> result = crewMemberService.inviteCrewMembers(emails);
+
+        // Assert
+        assertThat(result).isEqualTo(emails);
+    }
+
+    @Test
+    void shouldDeleteCrewMemberAndAssociatedData() {
+        Long userId = 1L;
+        CrewMember cm = new CrewMember();
+        cm.setId(userId);
+
+        when(crewMemberRepository.findById(userId)).thenReturn(Optional.of(cm));
+
+        crewMemberService.deleteCrewMember(userId);
+
+        verify(crewScheduleRepository).deleteAllByCrewMember_Id(userId);
+        verify(availabilityRepository).deleteAllByCrewMember_Id(userId);
+        verify(crewMemberRepository).delete(cm);
+    }
+
+
 
 }
