@@ -214,7 +214,7 @@ export default {
 
       try {
         const res = await axios.post('http://localhost:8080/user/invite', {
-          email: this.inviteEmail
+          emails: [this.inviteEmail.trim()]
         });
 
         if (res.data.flag && res.data.code === 200) {

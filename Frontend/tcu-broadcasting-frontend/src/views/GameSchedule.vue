@@ -27,8 +27,7 @@
               <th>Date</th>
               <th>Opponent</th>
               <th>Venue</th>
-              <th>Finalized?</th>
-              <th>Action</th>
+              <!--<th>Finalized?</th>-->
             </tr>
           </thead>
           <tbody>
@@ -36,9 +35,8 @@
               <td>{{ formatDate(game.gameDate) }}</td>
               <td>{{ game.opponent }}</td>
               <td>{{ game.venue }}</td>
-              <td>{{ game.finalized ? 'Yes' : 'No' }}</td>
+              <!--<td>{{ game.finalized ? 'Yes' : 'No' }}</td>-->
               <!--<td>{{ game.requiredCrew.join(', ') }}</td>-->
-              <td><button @click="viewDetails(game)" class="btn btn-info">View</button></td>
             </tr>
           </tbody>
         </table>
