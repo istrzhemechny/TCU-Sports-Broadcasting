@@ -35,10 +35,10 @@
             </thead>
             <tbody>
                 <tr v-for="member in crewDetails.crewedMembers" :key="member.crewedUserId">
-                <td>{{ member.Position }}</td>
+                <td>{{ member.position }}</td>
                 <td>{{ member.fullName }}</td>
-                <td>{{ member.ReportTime }}</td>
-                <td>{{ member.ReportLocation }}</td>
+                <td>{{ member.reportTime }}</td>
+                <td>{{ member.reportLocation }}</td>
                 </tr>
             </tbody>
             </table>
@@ -85,7 +85,7 @@
         this.errorMessage = ''
   
         try {
-          const response = await axios.get(`http://localhost:8080/crewList/${this.selectedGameId}`)
+          const response = await axios.get(`http://localhost:8080/crewSchedule/crewList/crewList/${this.selectedGameId}`)
           if (response.data.flag && response.data.code === 200) {
             this.crewDetails = response.data.data
           } else {
@@ -96,14 +96,6 @@
         }
       }
     },
-
-
-
-
-
-
-
-
 
     mounted() {
       this.fetchGames()
