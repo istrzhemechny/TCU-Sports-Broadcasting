@@ -7,6 +7,10 @@ import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailException;
 import edu.tcu.cs.tcusportsbroadcasting.crewschedule.CrewScheduleRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class CrewMemberService {
+public class CrewMemberService implements UserDetailsService {
 
     private final CrewMemberRepository crewMemberRepository;
 
@@ -23,10 +27,13 @@ public class CrewMemberService {
 
     private final AvailabilityRepository availabilityRepository;
 
-    public CrewMemberService(CrewMemberRepository crewMemberRepository, CrewScheduleRepository crewScheduleRepository, AvailabilityRepository availabilityRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    public CrewMemberService(CrewMemberRepository crewMemberRepository, CrewScheduleRepository crewScheduleRepository, AvailabilityRepository availabilityRepository, PasswordEncoder passwordEncoder) {
         this.crewMemberRepository = crewMemberRepository;
         this.crewScheduleRepository = crewScheduleRepository;
         this.availabilityRepository = availabilityRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public CrewMemberResponseDto addCrewMember(String token, CrewMemberDto dto) {
@@ -39,7 +46,7 @@ public class CrewMemberService {
         crewMember.setLastName(dto.getLastName());
         crewMember.setEmail(dto.getEmail());
         crewMember.setPhoneNumber(dto.getPhoneNumber());
-        crewMember.setPassword(dto.getPassword()); // consider hashing in the future
+        crewMember.setPassword(this.passwordEncoder.encode(dto.getPassword())); // now hashed
         crewMember.setRole(dto.getRole());
         crewMember.setPosition(dto.getPosition());
 
@@ -100,5 +107,12 @@ public class CrewMemberService {
     public List<String> inviteCrewMembers(List<String> emails) {
         // Later add hook in email logic or invitation token generation
         return emails;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return this.crewMemberRepository.findByEmail(email)
+                .map(crewMember -> new MyCrewMemberPrincipal(crewMember))
+                .orElseThrow(() -> new UsernameNotFoundException("Email " + email + " not found"));
     }
 }

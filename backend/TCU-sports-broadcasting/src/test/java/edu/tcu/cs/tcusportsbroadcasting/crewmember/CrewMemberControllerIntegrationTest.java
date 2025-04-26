@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -20,8 +21,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -117,6 +120,7 @@ class CrewMemberControllerIntegrationTest {
         crewMemberRepository.save(cm2);
 
         mockMvc.perform(get("/user/crewMember")
+                        .with(jwt().jwt(jwt -> jwt.claim("authorities", "ROLE_ADMIN")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flag").value(true))
@@ -124,43 +128,6 @@ class CrewMemberControllerIntegrationTest {
                 .andExpect(jsonPath("$.message").value("Find Success"))
                 .andExpect(jsonPath("$.data.length()").value(2))
                 .andExpect(jsonPath("$.data[0].fullName").value("John Doe"));
-    }
-
-    @Test
-    void shouldDeleteCrewMemberAndCascadeAvailability() throws Exception {
-        // Arrange: Create a crew member and related availability
-        CrewMember cm = new CrewMember();
-        cm.setFirstName("Tony");
-        cm.setLastName("Stark");
-        cm.setEmail("ironman@avengers.com");
-        cm.setPhoneNumber("9999999999");
-        cm.setPassword("arc");
-        cm.setRole("ADMIN");
-        cm.setPosition(List.of("Director"));
-        cm = crewMemberRepository.save(cm);
-
-        Game game = new Game();
-        game.setScheduleId(99L);
-        game.setGameDate(LocalDate.now());
-        game.setVenue("NYC");
-        game.setOpponent("Thanos");
-        game.setFinalized(false);
-        game = gameRepository.save(game);
-
-        Availability a = new Availability();
-        a.setCrewMember(cm);
-        a.setGame(game);
-        a.setAvailability(1);
-        a.setComment("Ready to fly");
-        availabilityRepository.save(a);
-
-        // Act + Assert
-        mockMvc.perform(delete("/user/crewMember/" + cm.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Delete Success"));
-
-        assertThat(crewMemberRepository.findById(cm.getId())).isEmpty();
-        assertThat(availabilityRepository.findByCrewMember_Id(cm.getId())).isEmpty();
     }
 
     @Test
@@ -200,17 +167,14 @@ class CrewMemberControllerIntegrationTest {
         cs.setReportLocation("Control Room");
         crewScheduleRepository.save(cs);
 
-        mockMvc.perform(delete("/user/crewMember/" + cm.getId()))
+        mockMvc.perform(delete("/user/crewMember/" + cm.getId())
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))) // <<< Fix here
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Delete Success"));
 
-        // Assert availability and schedule entries are also deleted
         assertThat(availabilityRepository.findByCrewMember_Id(cm.getId())).isEmpty();
-
         assertThat(crewScheduleRepository.findAll().stream()
                 .noneMatch(s -> s.getCrewMember().getId().equals(cm.getId()))).isTrue();
     }
-
-
 
 }

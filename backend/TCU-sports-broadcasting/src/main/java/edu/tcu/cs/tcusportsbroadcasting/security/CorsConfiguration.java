@@ -1,4 +1,4 @@
-package edu.tcu.cs.tcusportsbroadcasting.Security;
+package edu.tcu.cs.tcusportsbroadcasting.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

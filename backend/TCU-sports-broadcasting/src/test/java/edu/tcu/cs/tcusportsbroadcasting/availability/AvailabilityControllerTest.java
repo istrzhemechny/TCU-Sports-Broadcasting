@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -41,6 +42,7 @@ class AvailabilityControllerTest {
         Mockito.when(availabilityService.addAvailability(Mockito.any())).thenReturn(response);
 
         mockMvc.perform(post("/availability/availability")
+                        .with(jwt().jwt(jwt -> jwt.claim("authorities", "ROLE_ADMIN")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -57,6 +59,7 @@ class AvailabilityControllerTest {
         Mockito.when(availabilityService.findByUserId(1L)).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/availability/availability/1")
+                        .with(jwt().jwt(jwt -> jwt.claim("authorities", "ROLE_ADMIN")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.length()").value(1))

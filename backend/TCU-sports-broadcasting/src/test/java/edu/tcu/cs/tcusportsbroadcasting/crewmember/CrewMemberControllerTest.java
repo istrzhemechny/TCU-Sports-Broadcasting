@@ -19,6 +19,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -62,6 +63,7 @@ class CrewMemberControllerTest {
 
         // Act + Assert
         mockMvc.perform(post("/user/crewMember?token=test-token")
+                        .with(jwt().jwt(jwt -> jwt.claim("authorities", "ROLE_ADMIN")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -90,6 +92,7 @@ class CrewMemberControllerTest {
 
         // Act + Assert
         mockMvc.perform(get("/user/crewMember/{userId}", id)
+                        .with(jwt().jwt(jwt -> jwt.claim("authorities", "ROLE_ADMIN")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flag").value(true))
@@ -110,6 +113,7 @@ class CrewMemberControllerTest {
         Mockito.when(crewMemberService.findAll()).thenReturn(List.of(cm1, cm2));
 
         mockMvc.perform(get("/user/crewMember")
+                        .with(jwt().jwt(jwt -> jwt.claim("authorities", "ROLE_ADMIN")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flag").value(true))
@@ -126,7 +130,8 @@ class CrewMemberControllerTest {
         doNothing().when(crewMemberService).deleteCrewMember(userId);
 
         // Act + Assert
-        mockMvc.perform(delete("/user/crewMember/{userId}", userId))
+        mockMvc.perform(delete("/user/crewMember/{userId}", userId)
+                        .with(jwt().jwt(jwt -> jwt.claim("authorities", "ROLE_ADMIN"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flag").value(true))
                 .andExpect(jsonPath("$.code").value(200))
@@ -141,7 +146,8 @@ class CrewMemberControllerTest {
         doThrow(new CrewMemberNotFoundException(userId)).when(crewMemberService).deleteCrewMember(userId);
 
         // Act + Assert
-        mockMvc.perform(delete("/user/crewMember/{userId}", userId))
+        mockMvc.perform(delete("/user/crewMember/{userId}", userId)
+                        .with(jwt().jwt(jwt -> jwt.claim("authorities", "ROLE_ADMIN"))))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.flag").value(false))
                 .andExpect(jsonPath("$.code").value(404))
@@ -160,6 +166,7 @@ class CrewMemberControllerTest {
 
         // Act & Assert
         mockMvc.perform(post("/user/invite")
+                        .with(jwt().jwt(jwt -> jwt.claim("authorities", "ROLE_ADMIN")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
