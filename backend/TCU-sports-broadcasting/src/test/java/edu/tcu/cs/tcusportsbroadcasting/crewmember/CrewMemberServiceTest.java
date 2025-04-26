@@ -8,6 +8,7 @@ import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailExcep
 import edu.tcu.cs.tcusportsbroadcasting.crewschedule.CrewScheduleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,16 +28,20 @@ class CrewMemberServiceTest {
 
     private AvailabilityRepository availabilityRepository;
 
+    private PasswordEncoder passwordEncoder;
+
     @BeforeEach
     void setUp() {
         crewMemberRepository = mock(CrewMemberRepository.class);
         crewScheduleRepository = mock(CrewScheduleRepository.class);
         availabilityRepository = mock(AvailabilityRepository.class);
+        passwordEncoder = mock(PasswordEncoder.class);
 
         crewMemberService = new CrewMemberService(
                 crewMemberRepository,
                 crewScheduleRepository,
-                availabilityRepository
+                availabilityRepository,
+                passwordEncoder
         );
     }
 
@@ -49,7 +54,7 @@ class CrewMemberServiceTest {
         dto.setLastName("Wonderland");
         dto.setEmail("alice@wonder.com");
         dto.setPhoneNumber("1234567890");
-        dto.setPassword("pass123");
+        dto.setPassword(passwordEncoder.encode("pass123"));
         dto.setRole("USER");
         dto.setPosition(Arrays.asList("Director", "Graphics"));
 

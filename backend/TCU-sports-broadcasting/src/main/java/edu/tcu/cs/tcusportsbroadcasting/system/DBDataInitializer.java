@@ -9,6 +9,7 @@ import edu.tcu.cs.tcusportsbroadcasting.crewschedule.CrewScheduleRepository;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.Game;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.GameRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -26,11 +27,14 @@ public class DBDataInitializer implements CommandLineRunner {
 
     private final CrewScheduleRepository crewScheduleRepository;
 
-    public DBDataInitializer(CrewMemberRepository crewMemberRepository, GameRepository gameRepository, AvailabilityRepository availabilityRepository, CrewScheduleRepository crewScheduleRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    public DBDataInitializer(CrewMemberRepository crewMemberRepository, GameRepository gameRepository, AvailabilityRepository availabilityRepository, CrewScheduleRepository crewScheduleRepository, PasswordEncoder passwordEncoder) {
         this.crewMemberRepository = crewMemberRepository;
         this.gameRepository = gameRepository;
         this.availabilityRepository = availabilityRepository;
         this.crewScheduleRepository = crewScheduleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -40,7 +44,7 @@ public class DBDataInitializer implements CommandLineRunner {
         cm1.setLastName("Doe");
         cm1.setEmail("john.doe@example.com");
         cm1.setPhoneNumber("1234567890");
-        cm1.setPassword("P@ssw0rd");
+        cm1.setPassword(passwordEncoder.encode("password"));
         cm1.setRole("ADMIN");
         cm1.setPosition(Arrays.asList("Director", "Producer"));
 
@@ -49,7 +53,7 @@ public class DBDataInitializer implements CommandLineRunner {
         cm2.setLastName("Smith");
         cm2.setEmail("jane.smith@example.com");
         cm2.setPhoneNumber("9876543210");
-        cm2.setPassword("Secret123");
+        cm2.setPassword(passwordEncoder.encode("secret123"));
         cm2.setRole("USER");
         cm2.setPosition(Arrays.asList("Camera", "Graphics"));
 
@@ -61,7 +65,7 @@ public class DBDataInitializer implements CommandLineRunner {
         cm3.setLastName("Kent");
         cm3.setEmail("clark.kent2@dailyplanet.com");
         cm3.setPhoneNumber("1234567890");
-        cm3.setPassword("superman");
+        cm3.setPassword(passwordEncoder.encode("superman"));
         cm3.setRole("ADMIN");
         cm3.setPosition(List.of("Director", "Producer"));
 

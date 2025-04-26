@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.tcu.cs.tcusportsbroadcasting.availability.dto.AvailabilityDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMember;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.CrewMemberRepository;
+import edu.tcu.cs.tcusportsbroadcasting.crewschedule.CrewScheduleRepository;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.Game;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.GameRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -35,6 +38,9 @@ class AvailabilityControllerIntegrationTest {
     private GameRepository gameRepository;
 
     @Autowired
+    private CrewScheduleRepository crewScheduleRepository;
+
+    @Autowired
     private AvailabilityRepository availabilityRepository;
 
     @Autowired
@@ -47,6 +53,7 @@ class AvailabilityControllerIntegrationTest {
     @BeforeEach
     void setUp() {
         availabilityRepository.deleteAll();
+        crewScheduleRepository.deleteAll();
         crewMemberRepository.deleteAll();
         gameRepository.deleteAll();
 
@@ -81,12 +88,14 @@ class AvailabilityControllerIntegrationTest {
         dto.setComment("Ready");
 
         mockMvc.perform(post("/availability/availability")
+                        .with(jwt().jwt(jwt -> jwt.claim("authorities", "ROLE_ADMIN")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.userId").value(userId))
                 .andExpect(jsonPath("$.data.gameId").value(gameId))
                 .andExpect(jsonPath("$.data.scheduleId").value(scheduleId));
+
     }
 
     @Test
@@ -100,6 +109,7 @@ class AvailabilityControllerIntegrationTest {
         availabilityRepository.save(a);
 
         mockMvc.perform(get("/availability/availability/" + userId)
+                        .with(jwt().jwt(jwt -> jwt.claim("authorities", "ROLE_ADMIN")))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.flag").value(true))

@@ -11,11 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import java.time.LocalDate;
 import java.util.List;
+import static java.util.List.of;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -85,6 +89,7 @@ class CrewScheduleControllerIntegrationTest {
 
         // -- Act & Assert
         mockMvc.perform(post("/crewSchedule/crewSchedule/" + game.getGameId())
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(List.of(dto1, dto2))))
                 .andExpect(status().isOk())
@@ -102,6 +107,7 @@ class CrewScheduleControllerIntegrationTest {
         dto.setPosition("GRAPHICS");
 
         mockMvc.perform(post("/crewSchedule/crewSchedule/999")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(List.of(dto))))
                 .andExpect(status().isNotFound())
@@ -114,6 +120,7 @@ class CrewScheduleControllerIntegrationTest {
         dto.setUserId(1L); // no position
 
         mockMvc.perform(post("/crewSchedule/crewSchedule/1")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(List.of(dto))))
                 .andExpect(status().isBadRequest())

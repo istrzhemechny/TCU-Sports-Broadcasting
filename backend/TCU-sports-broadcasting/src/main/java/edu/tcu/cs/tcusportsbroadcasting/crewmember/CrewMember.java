@@ -1,12 +1,15 @@
 package edu.tcu.cs.tcusportsbroadcasting.crewmember;
 import edu.tcu.cs.tcusportsbroadcasting.availability.Availability;
 import jakarta.persistence.*;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class CrewMember {
+public class CrewMember{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,13 +19,14 @@ public class CrewMember {
 
     private String lastName;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
     private String phoneNumber;
 
     private String password;
 
+    @Column(nullable = false)
     private String role;
 
     @ElementCollection(fetch = FetchType.EAGER)
