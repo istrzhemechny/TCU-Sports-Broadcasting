@@ -8,6 +8,8 @@ import edu.tcu.cs.tcusportsbroadcasting.crewschedule.CrewSchedule;
 import edu.tcu.cs.tcusportsbroadcasting.crewschedule.CrewScheduleRepository;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.Game;
 import edu.tcu.cs.tcusportsbroadcasting.gameschedule.GameRepository;
+import edu.tcu.cs.tcusportsbroadcasting.gameschedule.GameSchedule;
+import edu.tcu.cs.tcusportsbroadcasting.gameschedule.GameScheduleRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -29,12 +31,15 @@ public class DBDataInitializer implements CommandLineRunner {
 
     private final PasswordEncoder passwordEncoder;
 
-    public DBDataInitializer(CrewMemberRepository crewMemberRepository, GameRepository gameRepository, AvailabilityRepository availabilityRepository, CrewScheduleRepository crewScheduleRepository, PasswordEncoder passwordEncoder) {
+    private final GameScheduleRepository gameScheduleRepository;
+
+    public DBDataInitializer(CrewMemberRepository crewMemberRepository, GameRepository gameRepository, AvailabilityRepository availabilityRepository, CrewScheduleRepository crewScheduleRepository, PasswordEncoder passwordEncoder, GameScheduleRepository gameScheduleRepository) {
         this.crewMemberRepository = crewMemberRepository;
         this.gameRepository = gameRepository;
         this.availabilityRepository = availabilityRepository;
         this.crewScheduleRepository = crewScheduleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.gameScheduleRepository = gameScheduleRepository;
     }
 
     @Override
@@ -118,7 +123,11 @@ public class DBDataInitializer implements CommandLineRunner {
 
         this.crewScheduleRepository.saveAll(List.of(cs1, cs2));
 
+        GameSchedule gs1 = new GameSchedule();
+        gs1.setSport("Football");
+        gs1.setSeason("2024-2025");
 
+        this.gameScheduleRepository.save(gs1);
 
     }
 }

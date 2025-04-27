@@ -6,6 +6,7 @@ import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberListDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.InviteRequestDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.invite.dto.InviteResponseDto;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -157,14 +158,18 @@ class CrewMemberControllerTest {
 
     @Test
     void shouldInviteCrewMembersSuccessfully() throws Exception {
-        // Arrange
+
         List<String> emails = List.of("john.smith@example.com", "jane.doe@example.com");
         InviteRequestDto dto = new InviteRequestDto();
         dto.setEmails(emails);
 
-        Mockito.when(crewMemberService.inviteCrewMembers(emails)).thenReturn(emails);
+        List<InviteResponseDto> mockResponses = List.of(
+                new InviteResponseDto("john.smith@example.com", "https://localhost:8080/user/auth/login"),
+                new InviteResponseDto("jane.doe@example.com", "https://localhost:8080/user/auth/login")
+        );
 
-        // Act & Assert
+        Mockito.when(crewMemberService.inviteCrewMembers(emails)).thenReturn(mockResponses);
+
         mockMvc.perform(post("/user/invite")
                         .with(jwt().jwt(jwt -> jwt.claim("authorities", "ROLE_ADMIN")))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -174,8 +179,10 @@ class CrewMemberControllerTest {
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.message").value("Invite Success"))
                 .andExpect(jsonPath("$.data.length()").value(2))
-                .andExpect(jsonPath("$.data[0]").value("john.smith@example.com"))
-                .andExpect(jsonPath("$.data[1]").value("jane.doe@example.com"));
+                .andExpect(jsonPath("$.data[0].email").value("john.smith@example.com"))
+                .andExpect(jsonPath("$.data[0].link").value("https://localhost:8080/user/auth/login"))
+                .andExpect(jsonPath("$.data[1].email").value("jane.doe@example.com"))
+                .andExpect(jsonPath("$.data[1].link").value("https://localhost:8080/user/auth/login"));
     }
 
 

@@ -6,6 +6,7 @@ import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberListDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailException;
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.invite.dto.InviteResponseDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewschedule.CrewScheduleRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,6 +15,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.invite.InviteToken;
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.invite.InviteTokenRepository;
+
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,11 +35,14 @@ public class CrewMemberService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public CrewMemberService(CrewMemberRepository crewMemberRepository, CrewScheduleRepository crewScheduleRepository, AvailabilityRepository availabilityRepository, PasswordEncoder passwordEncoder) {
+    private final InviteTokenRepository inviteTokenRepository;
+
+    public CrewMemberService(CrewMemberRepository crewMemberRepository, CrewScheduleRepository crewScheduleRepository, AvailabilityRepository availabilityRepository, PasswordEncoder passwordEncoder, InviteTokenRepository inviteTokenRepository) {
         this.crewMemberRepository = crewMemberRepository;
         this.crewScheduleRepository = crewScheduleRepository;
         this.availabilityRepository = availabilityRepository;
         this.passwordEncoder = passwordEncoder;
+        this.inviteTokenRepository = inviteTokenRepository;
     }
 
     public CrewMemberResponseDto addCrewMember(String token, CrewMemberDto dto) {
@@ -104,9 +113,16 @@ public class CrewMemberService implements UserDetailsService {
     }
 
 
-    public List<String> inviteCrewMembers(List<String> emails) {
-        // Later add hook in email logic or invitation token generation
-        return emails;
+    public List<InviteResponseDto> inviteCrewMembers(List<String> emails) {
+        List<InviteResponseDto> invites = new ArrayList<>();
+
+        for (String email : emails) {
+            String link = "https://localhost:8080/user/auth/login"; // change to whatever front end login page is
+
+            invites.add(new InviteResponseDto(email, link));
+        }
+
+        return invites;
     }
 
     @Override
