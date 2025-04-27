@@ -1,11 +1,11 @@
 <template>
-    <header>
+    <div class="layout-wrapper">
       <TCUBanner></TCUBanner>
       <div class="content">
         <component :is="navComponent" />
         <router-view></router-view> 
       </div>
-    </header>
+    </div>
   </template>
   
   <script setup>
@@ -23,9 +23,16 @@
   </script>
   
   <style scoped>
-  
+  .layout-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Full page height */
+  }
   .content{
     display: flex;
+    flex: 1; 
+    overflow: hidden; 
+
   }
   
   </style>

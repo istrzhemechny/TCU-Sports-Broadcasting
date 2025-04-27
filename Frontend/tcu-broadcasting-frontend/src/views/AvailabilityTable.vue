@@ -49,10 +49,12 @@
   
   <script>
   import axios from 'axios';
+  import { userId } from '@/apis/auth';
+  console.log(`userId is ${userId.value}`)
+  
   export default {
     data() {
       return {
-        userId: 1,
         allGames: [],
         existingAvailability: [],
         gamesToSubmit: [],
@@ -71,7 +73,7 @@
         try {
           const [gamesRes, availRes] = await Promise.all([
             this.getAllGames(),
-            this.getUserAvailability(this.userId)
+            this.getUserAvailability(userId.value)
           ]);
   
           this.allGames = gamesRes.data;
@@ -95,7 +97,7 @@
 
         try {
           const payloads = this.selectedGames.map(gameId => ({
-            userId: this.userId,
+            userId: userId.value,
             gameId,
             availability: 1,
             comment: this.comments[gameId] || null

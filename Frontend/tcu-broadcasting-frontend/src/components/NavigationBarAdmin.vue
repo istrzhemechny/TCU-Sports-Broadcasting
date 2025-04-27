@@ -20,7 +20,8 @@ export default {
 <style scoped>
 .side-banner {
   width: 235px;
-  height: calc(100vh - 135px);
+  /*height: calc(100vh - 135px);*/
+  /*height: calc(100% - 135px);*/
   background-color: #4D1979;
   font-family: Arial, sans-serif;
   display: flex;
