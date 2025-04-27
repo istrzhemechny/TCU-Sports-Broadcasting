@@ -1,5 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { isAuthenticated } from '@/apis/auth'
+import { isAuthenticated, userRole, userId, token } from '@/apis/auth'
+
+// Restore sessionStorage on page reload
+const savedToken = sessionStorage.getItem('token')
+const savedRole = sessionStorage.getItem('role')
+const savedUserId = sessionStorage.getItem('userId')
+
+if (savedToken && savedRole && savedUserId) {
+  isAuthenticated.value = true
+  token.value = savedToken
+  userRole.value = savedRole
+  userId.value = savedUserId
+}
 
 // Create a router instance
 const router = createRouter({
@@ -17,47 +29,44 @@ const router = createRouter({
                 path: '/gameSchedule', 
                 name: 'gameSchedule', 
                 component: () => import('@/views/GameSchedule.vue'),
-                meta: { requiresAuth: true }
+                meta: { requiresAuth: true, roles: ['ADMIN', 'USER']  }
             },
             { 
                 path: '/crewMember', 
                 name: 'crewMembers', 
                 component: () => import('@/views/CrewMemberList.vue'),
-                meta: { requiresAuth: true },
+                meta: { requiresAuth: true, roles: ['USER']  },
             },
             { 
                 path: '/crewList', 
                 name: 'crewList', 
                 component: () => import('@/views/CrewList.vue'),
-                meta: { requiresAuth: true },
+                meta: { requiresAuth: true, roles: ['ADMIN', 'USER'] },
             },
             { 
                 path: '/availability', 
                 name: 'availability', 
                 component: () => import('@/views/AvailabilityTable.vue'),
-                meta: { requiresAuth: true }, 
+                meta: { requiresAuth: true, roles: ['USER'] }, 
             },
             { 
                 path: '/manageCrew', 
                 name: 'manageCrewMembers', 
                 component: () => import('@/views/ManageCrew.vue'),
-                meta: { requiresAuth: true }, 
+                meta: { requiresAuth: true, roles: ['ADMIN'] }, 
             },
             { 
                 path: '/manageSchedules', 
                 name: 'manageSchedules', 
                 component: () => import('@/views/ManageSchedules.vue'),
-                meta: { requiresAuth: true }, 
+                meta: { requiresAuth: true, roles: ['ADMIN'] }, 
             },
             { 
                 path: '/scheduleCrew', 
                 name: 'scheduleCrew', 
                 component: () => import('@/views/ScheduleCrew.vue'),
-                meta: { requiresAuth: true }, 
+                meta: { requiresAuth: true,  roles: ['ADMIN']  }, 
             },
-
-            
-            
         ]
     },
     {
@@ -79,15 +88,25 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from) => {
-    if (to.meta.requiresAuth && !isAuthenticated.value) {
+  const requiresAuth = to.meta.requiresAuth
+  const allowedRoles = to.meta.roles
+
+  if (to.meta.requiresAuth && !isAuthenticated.value) {
       // Redirect to the login page with the originally requested page as the redirect query parameter
       return { name: 'login', query: { redirect: to.fullPath } }
-    }
-  })
+  }
+
+  if (requiresAuth && allowedRoles && !allowedRoles.includes(userRole.value)) {
+    // Authenticated but wrong role -> show alert and redirect
+    alert('You do not have permission to view this page.');
+    return { name: 'gameSchedule' } // Redirect to a safe place (like dashboard)
+  }
+
+})
   
   // Global after each navigation guard (for cleanup or login)
   router.afterEach((to, from) => {
-    console.log(`Successfully navigated to: ${to.fullPath}`)
+    //console.log(`Successfully navigated to: ${to.fullPath}`)
   })
   
 

@@ -11,8 +11,7 @@ const login = async (username, password) => {
   loginError.value = null
 
   try {
-    /*
-    const res = await axios.post('http://localhost:8080/auth/login', {
+    const res = await axios.post('http://localhost:8080/user/auth/login', {
       email: username,
       password: password
     }, {
@@ -21,62 +20,20 @@ const login = async (username, password) => {
         'Accept': 'application/json'
       }
     })
-    */
-
-    // Mock Data
-    let res
-    if (username === 'admin@example.com' && password === 'adminpass') {
-      res = {
-        data: {
-          flag: true,
-          code: 200,
-          message: 'Login Success',
-          data: {
-            userId: 1,
-            role: 'ADMIN',
-            token: 'mock-jwt-token'
-          }
-        }
-      }
-    } else if (username === 'crew@example.com' && password === 'crewpass') {
-      res = {
-        data: {
-          flag: true,
-          code: 200,
-          message: 'Login Success',
-          data: {
-            userId: 2,
-            role: 'CREW',
-            token: 'mock-jwt-token-2'
-          }
-        }
-      }
-    } else {
-      res = {
-        data: {
-          flag: false,
-          code: 401,
-          message: 'username or password is incorrect',
-          data: null
-        }
-      }
-    }
-
-    //// End of Mock Data
 
     if (res.data.flag && res.data.code === 200) {
       const { userId: id, role, token: jwt } = res.data.data
 
-      // Store credentials in memory or localStorage if needed
+      // Store credentials
       isAuthenticated.value = true
       userRole.value = role
       userId.value = id
       token.value = jwt
 
       // Optionally persist values
-      localStorage.setItem('token', jwt)
-      localStorage.setItem('userId', id)
-      localStorage.setItem('role', role)
+      sessionStorage.setItem('token', jwt)
+      sessionStorage.setItem('userId', id)
+      sessionStorage.setItem('role', role)
 
     } else {
       isAuthenticated.value = false
@@ -96,7 +53,7 @@ const logout = () => {
   userId.value = null
   token.value = null
 
-  localStorage.clear()
+  sessionStorage.clear()
 }
 
 export {
