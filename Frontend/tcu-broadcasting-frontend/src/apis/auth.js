@@ -11,19 +11,27 @@ const login = async (username, password) => {
   loginError.value = null
 
   try {
-    console.log("attempting to login...")
-    const res = await axios.post('http://localhost:8080/user/auth/login', {
-      email: username,
-      password: password
-    }, {
+
+    const basicAuth = btoa(`${username}:${password}`); // Encode username:password in base64
+    console.log(`basic auth is: ${basicAuth}`)
+
+
+    const response = await fetch('http://localhost:8080/user/auth/login', {
+      method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Authorization': `Basic ${basicAuth}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
     })
 
-    if (res.data.flag && res.data.code === 200) {
-      const { userId: id, role, token: jwt } = res.data.data
+    const data = await response.json()
+
+    console.log('Login Response:', data);
+
+
+    if (data.flag && data.code === 200) {
+      const { userId: id, role, token: jwt } = data.data
 
       // Store credentials
       isAuthenticated.value = true
@@ -38,7 +46,7 @@ const login = async (username, password) => {
 
     } else {
       isAuthenticated.value = false
-      loginError.value = res.data.message || 'Login failed'
+      loginError.value = data.message || 'Login failed'
     }
 
   } catch (error) {
@@ -46,6 +54,8 @@ const login = async (username, password) => {
     loginError.value = error.response?.data?.message || 'Login failed'
     console.error('Login error:', error)
   }
+
+  
 }
 
 const logout = () => {
