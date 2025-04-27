@@ -11,6 +11,7 @@ const login = async (username, password) => {
   loginError.value = null
 
   try {
+    console.log("attempting to login...")
     const res = await axios.post('http://localhost:8080/user/auth/login', {
       email: username,
       password: password
