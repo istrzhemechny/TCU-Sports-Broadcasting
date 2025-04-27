@@ -5,6 +5,8 @@ import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.dto.CrewMemberResponseDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.CrewMemberNotFoundException;
 import edu.tcu.cs.tcusportsbroadcasting.crewmember.exception.DuplicateEmailException;
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.invite.InviteTokenRepository;
+import edu.tcu.cs.tcusportsbroadcasting.crewmember.invite.dto.InviteResponseDto;
 import edu.tcu.cs.tcusportsbroadcasting.crewschedule.CrewScheduleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,18 +32,23 @@ class CrewMemberServiceTest {
 
     private PasswordEncoder passwordEncoder;
 
+    private InviteTokenRepository inviteTokenRepository;
+
     @BeforeEach
     void setUp() {
         crewMemberRepository = mock(CrewMemberRepository.class);
         crewScheduleRepository = mock(CrewScheduleRepository.class);
         availabilityRepository = mock(AvailabilityRepository.class);
         passwordEncoder = mock(PasswordEncoder.class);
+        inviteTokenRepository = mock(InviteTokenRepository.class);
+
 
         crewMemberService = new CrewMemberService(
                 crewMemberRepository,
                 crewScheduleRepository,
                 availabilityRepository,
-                passwordEncoder
+                passwordEncoder,
+                inviteTokenRepository
         );
     }
 
@@ -145,16 +152,21 @@ class CrewMemberServiceTest {
     }
 
     @Test
-    void shouldReturnListOfInvitedEmails() {
-        // Arrange
+    void shouldReturnListOfInvitedEmailsAndLinks() {
+
         List<String> emails = List.of("john.smith@example.com", "jane.doe@example.com");
 
-        // Act
-        List<String> result = crewMemberService.inviteCrewMembers(emails);
+        List<InviteResponseDto> result = crewMemberService.inviteCrewMembers(emails);
 
-        // Assert
-        assertThat(result).isEqualTo(emails);
+        assertThat(result).hasSize(2);
+
+        assertThat(result.get(0).getEmail()).isEqualTo("john.smith@example.com");
+        assertThat(result.get(0).getLink()).isEqualTo("https://localhost:8080/user/auth/login");
+
+        assertThat(result.get(1).getEmail()).isEqualTo("jane.doe@example.com");
+        assertThat(result.get(1).getLink()).isEqualTo("https://localhost:8080/user/auth/login");
     }
+
 
     @Test
     void shouldDeleteCrewMemberAndAssociatedData() {
