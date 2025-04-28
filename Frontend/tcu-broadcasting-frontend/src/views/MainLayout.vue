@@ -17,7 +17,7 @@
   import TCUBanner from '@/components/TCUBanner.vue';
 
   const navComponent = computed(() => {
-    console.log(userRole.value)
+    //console.log(userRole.value)
     return userRole.value === 'ADMIN' ? NavigationBarAdmin : NavigationBarCrew
   })
   </script>

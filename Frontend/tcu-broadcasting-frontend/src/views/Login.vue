@@ -15,6 +15,12 @@
           
           <button type="submit">LOGIN</button>
           <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+
+
+          <p class="switch-text">
+            Don't have an account?
+            <router-link to="/register" class="link">Sign Up</router-link>
+          </p>
         </form>
       </div>
     </div>
