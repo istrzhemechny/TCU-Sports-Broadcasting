@@ -241,9 +241,15 @@ export default {
 
       try {
         // Step 1: Create the game schedule
+        const token = sessionStorage.getItem('token');
         const scheduleRes = await axios.post('http://localhost:8080/schedule/gameSchedule', {
           sport: this.newSchedule.sport.trim(),
           season: this.newSchedule.season.trim()
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         });
 
         if (!scheduleRes.data.flag || scheduleRes.data.code !== 200) {
@@ -264,7 +270,15 @@ export default {
             gameStartTime: game.startTime
           };
 
-          await axios.post(`http://localhost:8080/game/schedule/gameSchedule/${scheduleId}/games`, gamePayload);
+          const token = sessionStorage.getItem('token');
+          await axios.post(`http://localhost:8080/game/schedule/gameSchedule/${scheduleId}/games`, 
+          gamePayload,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
         }
 
         alert('Game schedule and games successfully created!');
@@ -332,6 +346,7 @@ export default {
       }
 
       try {
+        const token = sessionStorage.getItem('token');
         await axios.post(`http://localhost:8080/game/schedule/gameSchedule/${this.selectedScheduleId}/games`, {
           gameDate: this.newGame.gameDate,
           gameStartTime: this.newGame.startTime,
@@ -339,7 +354,13 @@ export default {
           venue: this.newGame.venue,
           opponent: this.newGame.opponent,
           isFinalized: true
-        });
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
 
         alert('Game added successfully!');
         this.closeAddGameModal();
