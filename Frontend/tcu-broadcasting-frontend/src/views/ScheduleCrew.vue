@@ -37,6 +37,11 @@
                 <span class="email">{{ member.email }}</span>
               </label>
             </div>
+
+            <div class="crew-form-row">
+              <label>Comment — </label>
+              <span class="email">{{ getComment(member.id) || 'No Comment Provided.' }}</span>
+            </div>
   
             <div class="crew-form-row">
               <label>Position:</label>
@@ -178,7 +183,7 @@ export default {
                 userId: id,
                 gameId: this.selectedGameId,
                 position: val.position,
-                reportTime: val.reportTime,
+                reportTime: this.formatTime(val.reportTime),
                 reportLocation: val.reportLocation
             };
             });
@@ -209,8 +214,28 @@ export default {
             console.error("Failed to submit crew assignments:", error);
             alert("Submission failed. Check console for details.");
         }
-        }
+    },
+    formatTime(time24) {
+      if (!time24) return '';
 
+      const [hourStr, minute] = time24.split(':');
+      let hour = parseInt(hourStr, 10);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+
+      hour = hour % 12;
+      hour = hour ? hour : 12; // 0 should become 12
+
+      return `${hour}:${minute} ${ampm}`;
+    },
+    getComment(userId) {
+      const availabilities = this.availabilityData[userId] || [];
+      const availabilityForSelectedGame = availabilities.find(entry => 
+        entry.gameId === this.selectedGameId
+      );
+
+      return availabilityForSelectedGame ? availabilityForSelectedGame.comment : null;
+    }
+      
   },
   mounted() {
     this.fetchGames();

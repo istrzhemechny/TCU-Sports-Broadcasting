@@ -62,7 +62,7 @@
         <label>Start Time</label>
         <input v-model="game.startTime" type="time" />
         <label>Report Time</label>
-        <input v-model="game.reportTime" type="time" />
+        <input v-model="game.reportTime" type="time"/>
         <input v-model="game.venue" type="text" placeholder="Venue" />
         <input v-model="game.opponent" type="text" placeholder="Opponent" />
       </div>
@@ -266,10 +266,9 @@ export default {
             venue: game.venue,
             opponent: game.opponent,
             isFinalized: true,
-            reportTime: game.reportTime,
-            gameStartTime: game.startTime
+            reportTime: this.formatTime(game.reportTime),
+            gameStartTime: this.formatTime(game.startTime)
           };
-
           const token = sessionStorage.getItem('token');
           await axios.post(`http://localhost:8080/game/schedule/gameSchedule/${scheduleId}/games`, 
           gamePayload,
@@ -349,8 +348,8 @@ export default {
         const token = sessionStorage.getItem('token');
         await axios.post(`http://localhost:8080/game/schedule/gameSchedule/${this.selectedScheduleId}/games`, {
           gameDate: this.newGame.gameDate,
-          gameStartTime: this.newGame.startTime,
-          reportTime: this.newGame.reportTime,
+          gameStartTime: this.formatTime(this.newGame.startTime),
+          reportTime: this.formatTime(this.newGame.reportTime),
           venue: this.newGame.venue,
           opponent: this.newGame.opponent,
           isFinalized: true
@@ -370,6 +369,19 @@ export default {
         console.error('Error adding new game:', error);
         alert('Failed to add game.');
       }
+    },
+
+    formatTime(time24) {
+      if (!time24) return '';
+
+      const [hourStr, minute] = time24.split(':');
+      let hour = parseInt(hourStr, 10);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+
+      hour = hour % 12;
+      hour = hour ? hour : 12; // 0 should become 12
+
+      return `${hour}:${minute} ${ampm}`;
     }
 
   }

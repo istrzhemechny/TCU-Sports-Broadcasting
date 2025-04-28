@@ -13,7 +13,7 @@ const login = async (username, password) => {
   try {
 
     const basicAuth = btoa(`${username}:${password}`); // Encode username:password in base64
-    console.log(`basic auth is: ${basicAuth}`)
+    //console.log(`basic auth is: ${basicAuth}`)
 
 
     const response = await fetch('http://localhost:8080/user/auth/login', {
@@ -27,7 +27,7 @@ const login = async (username, password) => {
 
     const data = await response.json()
 
-    console.log('Login Response:', data);
+    //console.log('Login Response:', data);
 
 
     if (data.flag && data.code === 200) {
