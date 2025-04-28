@@ -87,7 +87,7 @@ export default {
             entries.some(entry => entry.gameId === this.selectedGameId)
         )
         .map(([userId]) => parseInt(userId))
-        .filter(userId => !this.alreadyScheduledUserIds.has(userId)); // 🚫 filter out scheduled
+        .filter(userId => !this.alreadyScheduledUserIds.has(userId)); 
 
         matchingUserIds.forEach(id => {
         if (!this.assignmentSelections[id]) {
@@ -192,9 +192,17 @@ export default {
             alert("No new crew members selected.");
             return;
         }
-
+        
         try {
-            await axios.post(`http://localhost:8080/crewSchedule/crewSchedule/${this.selectedGameId}`, payload);
+            const token = sessionStorage.getItem('token');
+            await axios.post(`http://localhost:8080/crewSchedule/crewSchedule/${this.selectedGameId}`, 
+            payload,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            }
+            );
             alert("Crew assigned successfully!");
             await this.fetchScheduledCrew(this.selectedGameId); // refresh after submission
         } catch (error) {

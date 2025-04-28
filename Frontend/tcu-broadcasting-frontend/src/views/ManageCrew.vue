@@ -117,6 +117,7 @@
 <script>
 import axios from 'axios'
 
+
 export default {
   name: 'ManageCrew',
   data() {
@@ -185,8 +186,12 @@ export default {
     },
     async performDeletion() {
       try {
-        console.log(`crewMember to delete is ${this.selectedMember.userId}`)
-        await axios.delete(`http://localhost:8080/user/crewMember/${this.selectedMember.userId}`)
+        const token = sessionStorage.getItem('token')
+        await axios.delete(`http://localhost:8080/user/crewMember/${this.selectedMember.userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         this.crewMembers = this.crewMembers.filter(
           m => m.userId !== this.selectedMember.userId
         )
