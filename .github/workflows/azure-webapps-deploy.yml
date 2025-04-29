@@ -41,10 +41,10 @@ jobs:
       - name: Build and push container image to registry
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./backend/TCU-sports-broadcasting
           push: true
           tags: ghcr.io/${{ env.REPO }}:${{ github.sha }}
-          file: ./Dockerfile
+          file: ./backend/TCU-sports-broadcasting/Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
