@@ -23,4 +23,5 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Build and test with Maven
+        working-directory: ./backend/TCU-sports-broadcasting
         run: mvn --batch-mode package
