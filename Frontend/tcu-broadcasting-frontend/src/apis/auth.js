@@ -16,7 +16,8 @@ const login = async (username, password) => {
     //console.log(`basic auth is: ${basicAuth}`)
 
 
-    const response = await fetch('http://localhost:8080/user/auth/login', {
+    //const response = await fetch('http://localhost:8080/user/auth/login', {
+    const response = await fetch('https://tcu-sports-broadcasting-stefan.azurewebsites.net/user/auth/login', {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${basicAuth}`,

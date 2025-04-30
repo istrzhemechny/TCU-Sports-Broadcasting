@@ -59,7 +59,8 @@
     methods: {
       async fetchCrewMembers() {
         try {
-          const response = await axios.get('http://localhost:8080/user/crewMember');
+          //const response = await axios.get('http://localhost:8080/user/crewMember');
+          const response = await axios.get('https://tcu-sports-broadcasting-stefan.azurewebsites.net/user/crewMember');
           if (response.data.flag && response.data.code === 200) {
             this.crewMembers = response.data.data;
           } else {
@@ -74,7 +75,8 @@
 
       async selectMember(member) {
         try {
-          const response = await axios.get(`http://localhost:8080/user/crewMember/${member.userId}`);
+          //const response = await axios.get(`http://localhost:8080/user/crewMember/${member.userId}`);
+          const response = await axios.get(`https://tcu-sports-broadcasting-stefan.azurewebsites.net/user/crewMember/${member.userId}`);
           if (response.data.flag && response.data.code === 200) {
             this.selectedMember = response.data.data;
           } else {

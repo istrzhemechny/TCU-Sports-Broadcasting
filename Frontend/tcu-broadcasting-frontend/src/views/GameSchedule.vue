@@ -102,7 +102,8 @@
     methods: {
       async fetchGameSchedule() {
         try {
-          const response = await axios.get('http://localhost:8080/game/gameSchedule/games');
+          //const response = await axios.get('http://localhost:8080/game/gameSchedule/games');
+          const response = await axios.get('https://tcu-sports-broadcasting-stefan.azurewebsites.net/game/gameSchedule/games');
           if (response.data.flag && response.data.code === 200) {
             this.games = response.data.data;
           } else {

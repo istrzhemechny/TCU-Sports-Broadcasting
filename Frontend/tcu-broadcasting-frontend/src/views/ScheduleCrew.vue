@@ -120,7 +120,8 @@ export default {
   methods: {
     async fetchGames() {
       try {
-        const res = await axios.get('http://localhost:8080/game/gameSchedule/games');
+        //const res = await axios.get('http://localhost:8080/game/gameSchedule/games');
+        const res = await axios.get('https://tcu-sports-broadcasting-stefan.azurewebsites.net/game/gameSchedule/games');
         this.games = res.data.data;
       } catch (err) {
         console.error('Error fetching games', err);
@@ -131,15 +132,18 @@ export default {
     },
     async fetchCrewAndAvailability() {
       try {
-        const crewRes = await axios.get('http://localhost:8080/user/crewMember');
+        //const crewRes = await axios.get('http://localhost:8080/user/crewMember');
+        const crewRes = await axios.get('https://tcu-sports-broadcasting-stefan.azurewebsites.net/user/crewMember');
         this.crewMembers = crewRes.data.data;
 
         const promises = this.crewMembers.map(async (member) => {
           try {
-            const availRes = await axios.get(`http://localhost:8080/availability/availability/${member.userId}`);
+            //const availRes = await axios.get(`http://localhost:8080/availability/availability/${member.userId}`);
+            const availRes = await axios.get(`https://tcu-sports-broadcasting-stefan.azurewebsites.net/availability/availability/${member.userId}`);
             this.availabilityData[member.userId] = availRes.data.data;
 
-            const detailRes = await axios.get(`http://localhost:8080/user/crewMember/${member.userId}`);
+            //const detailRes = await axios.get(`http://localhost:8080/user/crewMember/${member.userId}`);
+            const detailRes = await axios.get(`https://tcu-sports-broadcasting-stefan.azurewebsites.net/user/crewMember/${member.userId}`);
             this.detailedCrew[member.userId] = detailRes.data.data;
           } catch (err) {
             console.error(`Error fetching data for user ${member.userId}`, err);
@@ -153,7 +157,8 @@ export default {
     },
     async fetchScheduledCrew(gameId) {
       try {
-        const res = await axios.get(`http://localhost:8080/crewSchedule/crewList/crewList/${gameId}`);
+        //const res = await axios.get(`http://localhost:8080/crewSchedule/crewList/crewList/${gameId}`);
+        const res = await axios.get(`https://tcu-sports-broadcasting-stefan.azurewebsites.net/crewSchedule/crewList/crewList/${gameId}`);
         const scheduledMembers = res.data.data.crewedMembers;
         this.alreadyScheduledUserIds = new Set(scheduledMembers.map(member => member.userId));
       } catch (error) {
@@ -200,13 +205,14 @@ export default {
         
         try {
             const token = sessionStorage.getItem('token');
-            await axios.post(`http://localhost:8080/crewSchedule/crewSchedule/${this.selectedGameId}`, 
-            payload,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`
+            //await axios.post(`http://localhost:8080/crewSchedule/crewSchedule/${this.selectedGameId}`, payload);
+            await axios.post(`https://tcu-sports-broadcasting-stefan.azurewebsites.net/crewSchedule/crewSchedule/${this.selectedGameId}`, 
+              payload,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`
+                }
               }
-            }
             );
             alert("Crew assigned successfully!");
             await this.fetchScheduledCrew(this.selectedGameId); // refresh after submission
