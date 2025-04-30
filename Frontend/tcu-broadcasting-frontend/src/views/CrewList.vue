@@ -70,7 +70,8 @@
     methods: {
       async fetchGames() {
         try {
-          const response = await axios.get('http://localhost:8080/game/gameSchedule/games')
+          //const response = await axios.get('http://localhost:8080/game/gameSchedule/games')
+          const response = await axios.get('https://tcu-sports-broadcasting-stefan.azurewebsites.net/game/gameSchedule/games')
           if (response.data.flag && response.data.code === 200) {
             this.games = response.data.data
           }
@@ -85,7 +86,8 @@
         this.errorMessage = ''
   
         try {
-          const response = await axios.get(`http://localhost:8080/crewSchedule/crewList/crewList/${this.selectedGameId}`)
+          //const response = await axios.get(`http://localhost:8080/crewSchedule/crewList/crewList/${this.selectedGameId}`)
+          const response = await axios.get(`https://tcu-sports-broadcasting-stefan.azurewebsites.net/crewSchedule/crewList/crewList/${this.selectedGameId}`)
           if (response.data.flag && response.data.code === 200) {
             this.crewDetails = response.data.data
           } else {

@@ -139,7 +139,8 @@ export default {
   methods: {
     async fetchCrewMembers() {
       try {
-        const res = await axios.get('http://localhost:8080/user/crewMember')
+        //const res = await axios.get('http://localhost:8080/user/crewMember')
+        const res = await axios.get('https://tcu-sports-broadcasting-stefan.azurewebsites.net/user/crewMember')
         if (res.data.flag && res.data.code === 200) {
           if (res.data.data.length === 0) {
               this.emptyList = true;
@@ -167,7 +168,8 @@ export default {
       this.hasFutureAssignments = false
 
       try {
-        const res = await axios.get(`http://localhost:8080/availability/availability/${member.userId}`)
+        //const res = await axios.get(`http://localhost:8080/availability/availability/${member.userId}`)
+        const res = await axios.get(`https://tcu-sports-broadcasting-stefan.azurewebsites.net/availability/availability/${member.userId}`)
         if (res.data.flag && res.data.code === 200 && Array.isArray(res.data.data) && res.data.data.length > 0) {
           this.hasFutureAssignments = true
         }
@@ -185,8 +187,16 @@ export default {
     },
     async performDeletion() {
       try {
+        const token = sessionStorage.getItem('token');
         console.log(`crewMember to delete is ${this.selectedMember.userId}`)
-        await axios.delete(`http://localhost:8080/user/crewMember/${this.selectedMember.userId}`)
+        //await axios.delete(`http://localhost:8080/user/crewMember/${this.selectedMember.userId}`)
+        await axios.delete(`https://tcu-sports-broadcasting-stefan.azurewebsites.net/user/crewMember/${this.selectedMember.userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+        )
         this.crewMembers = this.crewMembers.filter(
           m => m.userId !== this.selectedMember.userId
         )
@@ -213,9 +223,18 @@ export default {
       }
 
       try {
-        const res = await axios.post('http://localhost:8080/user/invite', {
+        const token = sessionStorage.getItem('token');
+        //const res = await axios.post('http://localhost:8080/user/invite', {
+        const res = await axios.post('https://tcu-sports-broadcasting-stefan.azurewebsites.net/user/invite', 
+        {
           emails: [this.inviteEmail.trim()]
-        });
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
 
         if (res.data.flag && res.data.code === 200) {
           alert('Invitation sent successfully!');
@@ -233,7 +252,8 @@ export default {
     async viewDetails(userId) {
       this.showSuccessPopup = false
       try {
-        const res = await axios.get(`http://localhost:8080/user/crewMember/${userId}`);
+        //const res = await axios.get(`http://localhost:8080/user/crewMember/${userId}`);
+        const res = await axios.get(`https://tcu-sports-broadcasting-stefan.azurewebsites.net/user/crewMember/${userId}`);
         if (res.data.flag && res.data.code === 200) {
           this.selectedDetails = res.data.data;
           this.showDetailsModal = true;

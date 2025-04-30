@@ -166,7 +166,8 @@ export default {
   methods: {
     async fetchGameSchedule() {
       try {
-        const response = await axios.get('http://localhost:8080/game/gameSchedule/games');
+        //const response = await axios.get('http://localhost:8080/game/gameSchedule/games');
+        const response = await axios.get('https://tcu-sports-broadcasting-stefan.azurewebsites.net/game/gameSchedule/games');
         if (response.data.flag && response.data.code === 200) {
           this.games = response.data.data;
         } else {
@@ -240,11 +241,16 @@ export default {
       }
 
       try {
+        const token = sessionStorage.getItem('token');
+        const authHeader = { headers: { Authorization: `Bearer ${token}` } };
         // Step 1: Create the game schedule
-        const scheduleRes = await axios.post('http://localhost:8080/schedule/gameSchedule', {
+        //const scheduleRes = await axios.post('http://localhost:8080/schedule/gameSchedule', {
+        const scheduleRes = await axios.post('https://tcu-sports-broadcasting-stefan.azurewebsites.net/schedule/gameSchedule', {
           sport: this.newSchedule.sport.trim(),
           season: this.newSchedule.season.trim()
-        });
+        },
+        authHeader
+      );
 
         if (!scheduleRes.data.flag || scheduleRes.data.code !== 200) {
           alert('Failed to create game schedule.');
@@ -264,7 +270,11 @@ export default {
             gameStartTime: game.startTime
           };
 
-          await axios.post(`http://localhost:8080/game/schedule/gameSchedule/${scheduleId}/games`, gamePayload);
+          //await axios.post(`http://localhost:8080/game/schedule/gameSchedule/${scheduleId}/games`, gamePayload);
+          await axios.post(`https://tcu-sports-broadcasting-stefan.azurewebsites.net/game/schedule/gameSchedule/${scheduleId}/games`, 
+            gamePayload,
+            authHeader
+          );
         }
 
         alert('Game schedule and games successfully created!');
@@ -332,14 +342,18 @@ export default {
       }
 
       try {
-        await axios.post(`http://localhost:8080/game/schedule/gameSchedule/${this.selectedScheduleId}/games`, {
+        const token = sessionStorage.getItem('token');
+        //await axios.post(`http://localhost:8080/game/schedule/gameSchedule/${this.selectedScheduleId}/games`, {
+        await axios.post(`https://tcu-sports-broadcasting-stefan.azurewebsites.net/game/schedule/gameSchedule/${this.selectedScheduleId}/games`, {
           gameDate: this.newGame.gameDate,
           gameStartTime: this.newGame.startTime,
           reportTime: this.newGame.reportTime,
           venue: this.newGame.venue,
           opponent: this.newGame.opponent,
           isFinalized: true
-        });
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
         alert('Game added successfully!');
         this.closeAddGameModal();
