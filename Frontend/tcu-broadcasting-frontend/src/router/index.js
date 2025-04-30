@@ -66,7 +66,7 @@ const router = createRouter({
                 name: 'scheduleCrew', 
                 component: () => import('@/views/ScheduleCrew.vue'),
                 meta: { requiresAuth: true,  roles: ['ADMIN']  }, 
-            },
+            }
         ]
     },
     {
@@ -75,6 +75,12 @@ const router = createRouter({
         component: () => import('@/views/Login.vue'),
         meta: { requiresAuth: false },
       },
+      { 
+        path: '/register', 
+        name: 'register', 
+        component: () => import('@/views/RegistrationForm.vue'),
+        meta: { requiresAuth: false }, 
+    }
 
     /*
     {

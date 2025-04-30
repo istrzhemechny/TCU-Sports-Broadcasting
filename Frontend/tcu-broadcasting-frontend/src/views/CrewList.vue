@@ -21,7 +21,7 @@
             <p><strong>Sport:</strong> Football</p> <!-- Static -->
             <p><strong>Opponent:</strong> {{ crewDetails.opponent }}</p>
             <p><strong>Game Date:</strong> {{ crewDetails.gameDate }}</p>
-            <p><strong>Game Time:</strong> {{ crewDetails.gameStart }}</p>
+            <!--<p><strong>Game Time:</strong> {{ crewDetails.gameStart }}</p>-->
             <p><strong>Venue:</strong> {{ crewDetails.venue }}</p>
     
             <table class="crew-table">

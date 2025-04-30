@@ -1,4 +1,5 @@
 <template>
+  <TCUBanner></TCUBanner>
     <div class="container">
       <h1>Crew Member Profile Setup</h1>
   
@@ -25,9 +26,15 @@
   
         <label>Password</label>
         <input type="password" v-model="form.password" class="input" required />
-  
-        <label>Role</label>
-        <input type="text" v-model="form.role" class="input" required />
+
+        <div class="form-group">
+          <label>Role</label>
+          <select v-model="form.role" id="role" required>
+            <option disabled value="">-- Select Role --</option>
+            <option value="ADMIN">Admin</option>
+            <option value="USER">User</option>
+          </select>
+        </div>
 
         <label>Qualified Positions</label>
         <div v-for="(position, index) in form.qualifiedPosition" :key="index" class="position-row">
@@ -74,7 +81,12 @@
   
   <script>
   import axios from 'axios';
+  import TCUBanner from '@/components/TCUBanner.vue';
   export default {
+    name: 'Registration',
+    components: {
+      TCUBanner
+    },
     data() {
       return {
         alreadyRegistered: false,
@@ -153,6 +165,7 @@
             role: this.form.role,
             position: this.form.qualifiedPosition
             };
+
 
             //await axios.post('http://localhost:8080/User/crewMember', payload);
             await axios.post('https://tcu-sports-broadcasting-stefan.azurewebsites.net/User/crewMember', payload);
@@ -245,5 +258,32 @@
     margin-top: -12px;
     margin-bottom: 12px;
   }
+  .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select {
+  padding: 0.5rem;
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #4D1979;
+  outline: none;
+}
   </style>
   

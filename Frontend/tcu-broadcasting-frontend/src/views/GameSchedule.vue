@@ -6,7 +6,6 @@
   
       <div v-else-if="games.length === 0">
         <p class="info">No upcoming games available at this time.</p>
-        <router-link to="/dashboard" class="btn btn-secondary">Return to Dashboard</router-link>
       </div>
   
       <div v-else>
@@ -27,6 +26,7 @@
               <th>Date</th>
               <th>Opponent</th>
               <th>Venue</th>
+              <th>Action</th>
               <!--<th>Finalized?</th>-->
             </tr>
           </thead>
@@ -35,6 +35,9 @@
               <td>{{ formatDate(game.gameDate) }}</td>
               <td>{{ game.opponent }}</td>
               <td>{{ game.venue }}</td>
+              <td>
+                <button class="btn btn-info" @click="viewCrewList(game.gameId)">View Crew List</button>
+              </td>
               <!--<td>{{ game.finalized ? 'Yes' : 'No' }}</td>-->
               <!--<td>{{ game.requiredCrew.join(', ') }}</td>-->
             </tr>
@@ -42,15 +45,21 @@
         </table>
       </div>
   
-      <div v-if="selectedGame" class="modal">
-        <div class="modal-content">
-          <h2>Game Details</h2>
-          <p><strong>Date:</strong> {{ formatDate(selectedGame.gameDate) }}</p>
-          <p><strong>Opponent:</strong> {{ selectedGame.opponent }}</p>
-          <p><strong>Venue:</strong> {{ selectedGame.venue }}</p>
-          <!--<p><strong>Required Crew:</strong> {{ selectedGame.requiredCrew.join(', ') }}</p>-->
-          <p><strong>Finalized:</strong> {{ selectedGame.finalized ? 'Yes' : 'No' }}</p>
-          <button @click="selectedGame = null" class="btn btn-secondary">Close</button>
+       <!-- Modal to show Crew List -->
+    <div v-if="selectedCrewList" class="modal">
+      <div class="modal-content">
+          <h2>Crew List for Game on {{ formatDate(selectedCrewList.gameDate) }}</h2>
+          <p><strong>Opponent:</strong> {{ selectedCrewList.opponent }}</p>
+          <p><strong>Venue:</strong> {{ selectedCrewList.venue }}</p>
+
+          <h3>Assigned Crew Members</h3>
+          <ul>
+            <li v-for="member in selectedCrewList.crewedMembers" :key="member.crewedUserId">
+              {{ member.fullName }} - {{ member.position }} (Report: {{ member.reportTime }}, {{ member.reportLocation }})
+            </li>
+          </ul>
+
+          <button @click="selectedCrewList = null" class="btn btn-secondary">Close</button>
         </div>
       </div>
     </div>
@@ -66,7 +75,8 @@
         loading: true,
         sortOption: 'date',
         searchQuery: '',
-        selectedGame: null
+        selectedGame: null,
+        selectedCrewList: null 
       };
     },
     computed: {
@@ -110,8 +120,18 @@
       formatDate(date) {
         return new Date(date).toLocaleDateString();
       },
-      viewDetails(game) {
-        this.selectedGame = game;
+      async viewCrewList(gameId) {
+        try {
+          const response = await axios.get(`http://localhost:8080/crewSchedule/crewList/crewList/${gameId}`);
+          if (response.data.flag && response.data.code === 200) {
+            this.selectedCrewList = response.data.data;
+          } else {
+            alert('Failed to load crew list.');
+          }
+        } catch (error) {
+          console.error('Error fetching crew list:', error);
+          alert('Error loading crew list.');
+        }
       }
     }
   };
