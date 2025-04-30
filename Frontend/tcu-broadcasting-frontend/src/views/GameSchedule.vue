@@ -122,7 +122,8 @@
       },
       async viewCrewList(gameId) {
         try {
-          const response = await axios.get(`http://localhost:8080/crewSchedule/crewList/crewList/${gameId}`);
+          //const response = await axios.get(`http://localhost:8080/crewSchedule/crewList/crewList/${gameId}`);
+          const response = await axios.get(`https://tcu-sports-broadcasting-stefan.azurewebsites.net/crewSchedule/crewList/crewList/${gameId}`);
           if (response.data.flag && response.data.code === 200) {
             this.selectedCrewList = response.data.data;
           } else {

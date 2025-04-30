@@ -168,7 +168,7 @@
 
 
             //await axios.post('http://localhost:8080/User/crewMember', payload);
-            await axios.post('https://tcu-sports-broadcasting-stefan.azurewebsites.net/User/crewMember', payload);
+            await axios.post('https://tcu-sports-broadcasting-stefan.azurewebsites.net/user/crewMember', payload);
 
             this.registered = true;
             //Modify after Vue Router Code Alongs
